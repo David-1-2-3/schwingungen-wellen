@@ -1,0 +1,2252 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Schwingungen und Wellen</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Interaktiv: gedämpfte Schwingung mit den drei Fällen, erzwungene Schwingung mit Resonanzkurve, und zwei Wellen, die sich auf einem Seil überlagern.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap">
+<script async src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<style>
+/* Same lab bench as Übung 10: animation on the left and sticky, instrument panel on the right; stacked on phones. */
+:root {
+  --bg: #F6F5F9; --surface: #FFFFFF; --ink: #1C1928; --muted: #5F5A70; --line: #DFDBE8;
+  --accent: #5A3DC8; --accent-ink: #FFFFFF; --accent-soft: #EEE9FC; --focus: #5A3DC8;
+  --scrim: rgba(246, 245, 249, 0.86); --qr-bg: #FFFFFF; --qr-ink: #000000;
+
+  --floor: #EFEDF3; --grid: #E2DEEA; --grid2: #CBC5D8; --mark: #3A3550;
+  --halo: rgba(255, 255, 255, 0.9); --shadow: rgba(70, 45, 30, 0.28);
+  --block: #9C9AA6; --blockedge: #6F6D7A; --spring: #2F9E44; --equi: #A9A2BC;
+  --ffield: #E0102A; --pos: #13865A; --neg: #E06A00;
+  --ekin: #E06A00; --epot: #2335E6; --heat: #C2255C;
+  --cx: #5A3DC8; --cv: #1E9E95; --ca: #C2255C; --cF: #E8772E;
+  --drv: #0B7FAB; --phs: #C2255C; --fluid: #3D8FD1;
+  --k1: #2F9E44; --k2: #E8772E; --k3: #2335E6;
+  --w1: #2F5BD8; --w2: #C2255C;
+
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --font-math: "STIX Two Text", "Cambria Math", "Times New Roman", serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121019; --surface: #1C1926; --ink: #EDEAF5; --muted: #A39DB5; --line: #2E2A3B;
+    --accent: #A08BFF; --accent-ink: #120F1C; --accent-soft: #241E3A; --focus: #A08BFF;
+    --scrim: rgba(18, 16, 25, 0.86);
+    --floor: #17141F; --grid: #231F2C; --grid2: #3A3448; --mark: #D6D1E6;
+    --halo: rgba(18, 16, 25, 0.85); --shadow: rgba(0, 0, 0, 0.55);
+    --block: #8B8996; --blockedge: #C2C0CA; --spring: #5FD07A; --equi: #6B6480;
+    --ffield: #FF5468; --pos: #3FCB8C; --neg: #FF9A3D;
+    --ekin: #FF9A3D; --epot: #7F8CFF; --heat: #FF6FA2;
+    --cx: #A890FF; --cv: #3CC9BE; --ca: #FF6FA2; --cF: #FF9A3D;
+    --drv: #4CC3F0; --phs: #FF6FA2; --fluid: #4F9FE0;
+    --k1: #5FD07A; --k2: #FF9A3D; --k3: #7F8CFF;
+    --w1: #7F9CFF; --w2: #FF6FA2;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121019; --surface: #1C1926; --ink: #EDEAF5; --muted: #A39DB5; --line: #2E2A3B;
+  --accent: #A08BFF; --accent-ink: #120F1C; --accent-soft: #241E3A; --focus: #A08BFF;
+  --scrim: rgba(18, 16, 25, 0.86);
+  --floor: #17141F; --grid: #231F2C; --grid2: #3A3448; --mark: #D6D1E6;
+  --halo: rgba(18, 16, 25, 0.85); --shadow: rgba(0, 0, 0, 0.55);
+  --block: #8B8996; --blockedge: #C2C0CA; --spring: #5FD07A; --equi: #6B6480;
+  --ffield: #FF5468; --pos: #3FCB8C; --neg: #FF9A3D;
+  --ekin: #FF9A3D; --epot: #7F8CFF; --heat: #FF6FA2;
+  --cx: #A890FF; --cv: #3CC9BE; --ca: #FF6FA2; --cF: #FF9A3D;
+  --drv: #4CC3F0; --phs: #FF6FA2; --fluid: #4F9FE0;
+  --k1: #5FD07A; --k2: #FF9A3D; --k3: #7F8CFF;
+  --w1: #7F9CFF; --w2: #FF6FA2;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 16px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 18px 40px; -webkit-text-size-adjust: 100%;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); background: var(--bg); z-index: 20; }
+.app { max-width: 1240px; margin: 0 auto; display: grid; gap: 16px; }
+.app > *, .layout > * { min-width: 0; }
+
+.top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.titles { min-width: 0; display: grid; gap: 4px; }
+.eyebrow { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+h1 { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: clamp(28px, 5.2vw, 44px); line-height: 1.02; letter-spacing: -0.015em; text-wrap: balance; }
+.lead { margin: 4px 0 0; color: var(--muted); max-width: 66ch; }
+
+/* page navigation: one page per topic of the lecture */
+.pages { display: flex; flex-wrap: wrap; gap: 6px; }
+.pages a { display: inline-flex; align-items: center; gap: 7px; min-height: 42px; padding: 0 14px 0 6px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); text-decoration: none; font-size: 15px; font-weight: 700; }
+.pages .n { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-family: var(--font-display); font-size: 15px; }
+.pages a[aria-current="page"] { background: var(--accent); border-color: transparent; color: var(--accent-ink); }
+.pages a[aria-current="page"] .n { background: var(--accent-ink); color: var(--accent); }
+.pages a:not([aria-current="page"]):hover { border-color: var(--accent); }
+.pages a:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.layout { display: grid; gap: 22px; }
+@media (min-width: 960px) {
+  .layout { grid-template-columns: minmax(0, 1.4fr) minmax(330px, 1fr); align-items: start; }
+}
+.stage { min-width: 0; display: grid; gap: 10px; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 6; background: var(--bg); padding-bottom: 10px; align-self: start; }
+@media (min-width: 960px) { .stage { top: calc(env(safe-area-inset-top, 0px) + 12px); padding-bottom: 0; } }
+@media (max-width: 959px) { .stage { box-shadow: 0 10px 12px -12px var(--shadow); margin-inline: -4px; padding-inline: 4px; } }
+
+.frames {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; padding: 4px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+}
+.frames button {
+  appearance: none; border: 0; background: transparent; color: var(--ink);
+  border-radius: 10px; padding: 7px 4px; font: inherit; cursor: pointer;
+  display: grid; align-content: center; text-align: center; min-height: 54px;
+}
+.frames .k { font-family: var(--font-display); font-weight: 700; font-size: 17px; line-height: 1.15; }
+.frames .s { font-size: 12px; color: var(--muted); line-height: 1.25; }
+.frames button[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); }
+.frames button[aria-selected="true"] .s { color: inherit; opacity: 0.85; }
+.frames button:not([aria-selected="true"]):hover { background: var(--accent-soft); }
+
+.btn {
+  appearance: none; font: inherit; font-weight: 700; font-size: 15px;
+  border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  padding: 0 16px; min-height: 50px; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap;
+}
+.btn svg { width: 18px; height: 18px; flex: none; }
+.btn:hover:not(:disabled) { border-color: var(--accent); }
+.btn:disabled { opacity: 0.5; cursor: default; }
+.btn.small { min-height: 40px; font-size: 14px; padding: 0 12px; }
+.btn[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--ink); }
+.btn:focus-visible, .frames button:focus-visible, .seg label:has(input:focus-visible),
+.chip:has(input:focus-visible), summary:focus-visible, input[type="range"]:focus-visible, input[type="url"]:focus-visible {
+  outline: 3px solid var(--focus); outline-offset: 2px;
+}
+.presets { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.panel { min-width: 0; display: grid; gap: 20px; }
+.explain { background: var(--accent-soft); border-radius: 16px; padding: 16px 18px 18px; display: grid; gap: 6px; align-content: start; }
+.pill { justify-self: start; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 10px; border-radius: 999px; background: var(--surface); color: var(--accent); }
+.pill[data-state="on"] { background: var(--accent); color: var(--accent-ink); }
+.pill[data-state="end"] { background: var(--ink); color: var(--bg); }
+.explain h2 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 23px; line-height: 1.15; text-wrap: balance; }
+.explain p { margin: 0; line-height: 1.75; }
+
+.group { border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 12px; min-width: 0; }
+.group h3 { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.group h3 .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; flex: none; }
+.note { margin: 0; font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+.m { font-family: var(--font-math); font-style: italic; white-space: nowrap; }
+.m sub { font-size: 0.68em; }
+.t-cx { color: var(--cx); } .t-cv { color: var(--cv); } .t-ca { color: var(--ca); } .t-cF { color: var(--cF); }
+.t-ek { color: var(--ekin); } .t-ep { color: var(--epot); } .t-q { color: var(--heat); } .t-g { color: var(--ffield); }
+.t-drv { color: var(--drv); } .t-phs { color: var(--phs); } .t-w1 { color: var(--w1); } .t-w2 { color: var(--w2); } .t-acc { color: var(--accent); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { position: relative; display: inline-flex; align-items: center; gap: 8px; padding: 7px 13px 7px 10px; min-height: 42px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; user-select: none; font-size: 14px; }
+.chip input { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; }
+.chip:has(input:checked) { border-color: var(--accent); }
+.chip:has(input:not(:checked)) { opacity: 0.5; }
+.chip:has(input:not(:checked)) .lbl { text-decoration: line-through; }
+
+.slider { display: grid; gap: 2px; }
+.slider .row { display: flex; justify-content: space-between; align-items: baseline; gap: 4px 12px; flex-wrap: wrap; }
+.slider label, .slider .lab { font-weight: 700; }
+.slider output { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 14px; }
+input[type="range"] { width: 100%; height: 34px; margin: 0; accent-color: var(--accent); }
+.seg { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 3px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); justify-self: start; max-width: 100%; }
+.seg label { position: relative; padding: 7px 12px; border-radius: 9px; cursor: pointer; font-size: 14px; font-variant-numeric: tabular-nums; }
+.seg input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.seg label:has(input:checked) { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
+.dblock { display: grid; gap: 10px; }
+.optnote { margin: 0; font-size: 14px; line-height: 1.6; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+
+.tablewrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+th, td { padding: 7px 6px; border-bottom: 1px solid var(--line); text-align: right; vertical-align: baseline; }
+thead th { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+tbody th { text-align: left; font-weight: 400; }
+tbody th .u { color: var(--muted); font-size: 12px; margin-left: 4px; }
+td { font-family: var(--font-math); font-size: 16px; min-width: 64px; white-space: nowrap; }
+td.txt { font-family: var(--font-body); font-size: 14px; }
+
+.eq { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px 14px; font-family: var(--font-math); font-size: 19px; line-height: 1.9; }
+.term { display: grid; justify-items: center; }
+.term small { font-family: var(--font-body); font-size: 12px; line-height: 1.3; color: var(--muted); text-align: center; }
+
+/* the three cases of the damped oscillation, as on the slide */
+.cases { display: grid; gap: 8px; }
+.case { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; background: var(--surface); display: grid; gap: 2px; }
+.case.on { border-color: var(--accent); background: var(--accent-soft); }
+.case h4 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 17px; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.case .tag { font-family: var(--font-body); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
+.case .eq { font-size: 17px; line-height: 1.7; }
+.case p { margin: 0; font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+details { border-bottom: 1px solid var(--line); padding: 4px 0 10px; }
+details:last-child { border-bottom: 0; }
+summary { cursor: pointer; font-weight: 700; padding: 6px 0; line-height: 1.7; }
+details p { margin: 4px 0 0; line-height: 1.75; }
+.foot { font-size: 13px; color: var(--muted); margin: 0; line-height: 1.6; }
+
+.step { display: grid; grid-template-columns: 30px 1fr; gap: 4px 10px; align-items: start; }
+.step .num { width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center;
+  font-family: var(--font-display); font-weight: 700; font-size: 14px; margin-top: 2px; }
+.step > div { display: grid; gap: 6px; min-width: 0; }
+.step p { margin: 0; line-height: 1.7; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13px; color: var(--muted); }
+.legend i { display: inline-block; width: 16px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 5px; }
+
+/* scale under a slider: a mark at a given position (--p) */
+.dscale { position: relative; height: 30px; margin: 0 9px; font-size: 12px; color: var(--muted); }
+.dscale::before { content: ""; position: absolute; left: 0; right: 0; top: 2px; height: 6px; border-radius: 3px;
+  background: linear-gradient(90deg, var(--accent-soft) 0 var(--p, 40%), var(--grid2) var(--p, 40%) 100%); }
+.dscale.plain::before { background: var(--grid2); }
+.dscale .mk { position: absolute; left: var(--p, 40%); top: 10px; transform: translateX(-50%); font-weight: 700; color: var(--ink); white-space: nowrap; }
+.dscale .mk::before { content: ""; position: absolute; left: 50%; top: -12px; width: 2px; height: 12px; background: var(--ink); transform: translateX(-50%); }
+.dscale .z1 { position: absolute; left: 0; top: 10px; }
+.dscale .z3 { position: absolute; right: 0; top: 10px; }
+@media (max-width: 420px) { .dscale .z1, .dscale .z3 { font-size: 11px; } }
+
+/* ---------- the animation ---------- */
+.stagewrap { position: relative; min-width: 0; }
+canvas.c3 { display: block; width: 100%; max-width: 100%; border-radius: 16px; background: var(--floor); }
+canvas.osc { aspect-ratio: 16 / 10; }
+canvas.tall { aspect-ratio: 16 / 11; max-height: calc(100vh - 40px); touch-action: pan-y; }
+@media (max-width: 959px) {
+  canvas.osc { aspect-ratio: 4 / 3; max-height: 46vh; }
+  canvas.tall { aspect-ratio: 1 / 1; max-height: 54vh; }
+}
+.viewbtns { position: absolute; top: 8px; right: 8px; display: flex; gap: 6px; }
+.ctrls { position: absolute; top: 6px; left: 8px; display: flex; gap: 8px; align-items: center; pointer-events: none; }
+.ctrls > * { pointer-events: auto; }
+.ibtn { appearance: none; width: 40px; height: 40px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  display: inline-grid; place-items: center; cursor: pointer; padding: 0; box-shadow: 0 4px 14px -6px var(--shadow); }
+.ibtn svg { width: 20px; height: 20px; }
+.ibtn.big { width: 48px; height: 48px; background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+.ibtn.big svg { width: 22px; height: 22px; }
+.ibtn:hover { border-color: var(--accent); }
+.ibtn:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+/* choose what the graph shows: small buttons on the canvas */
+.gsel { position: absolute; top: 10px; left: 40%; display: flex; gap: 2px; padding: 3px; background: var(--surface); border: 1px solid var(--line);
+  border-radius: 999px; box-shadow: 0 4px 14px -6px var(--shadow); }
+.gsel button { appearance: none; border: 0; background: transparent; color: var(--ink); font-family: var(--font-math); font-style: italic; font-size: 17px;
+  min-width: 34px; height: 32px; padding: 0 8px; border-radius: 999px; cursor: pointer; line-height: 1; white-space: nowrap; }
+.gsel button[aria-checked="true"] { background: var(--accent); color: var(--accent-ink); }
+.gsel button:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
+.gsel .e { font-style: normal; font-family: var(--font-body); font-weight: 700; font-size: 14px; }
+
+/* ---------- full screen ---------- */
+.stagewrap:fullscreen, .stagewrap.fs { background: var(--floor); display: block; }
+.stagewrap:-webkit-full-screen { background: var(--floor); display: block; }
+.stagewrap.fs { position: fixed; inset: 0; z-index: 100;
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
+.stagewrap:fullscreen canvas.c3, .stagewrap.fs canvas.c3 { width: 100%; height: 100%; max-height: none; aspect-ratio: auto; border-radius: 0; }
+.stagewrap:-webkit-full-screen canvas.c3 { width: 100%; height: 100%; max-height: none; aspect-ratio: auto; border-radius: 0; }
+.stagewrap.fs .viewbtns { top: calc(env(safe-area-inset-top, 0px) + 10px); right: calc(env(safe-area-inset-right, 0px) + 10px); }
+.stagewrap.fs .ctrls { top: calc(env(safe-area-inset-top, 0px) + 6px); left: calc(env(safe-area-inset-left, 0px) + 12px); }
+body.fs-open { overflow: hidden; }
+
+/* time derivatives: a dot (or two) above the letter */
+.dt, .dt2 { position: relative; display: inline-block; }
+.dt::after, .dt2::after { position: absolute; left: 55%; top: -0.32em; transform: translateX(-50%); font-style: normal; line-height: 1; }
+.dt::after { content: "\02D9"; }
+.dt2::after { content: "\00A8"; }
+
+/* ---------- QR code ---------- */
+.qr-overlay { position: fixed; inset: 0; z-index: 50; background: var(--scrim); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); display: grid; place-items: center; overflow-y: auto;
+  padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.qr-box { width: min(100%, 520px); background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 20px; display: grid; gap: 12px; box-shadow: 0 20px 60px var(--shadow); }
+.qr-box h2 { margin: 0; font-family: var(--font-display); font-size: 26px; }
+.qr-code { background: var(--qr-bg); color: var(--qr-ink); border-radius: 14px; padding: 10px; display: grid; place-items: center; width: min(100%, 64vh); justify-self: center; aspect-ratio: 1 / 1; }
+.qr-code canvas { width: 100%; height: auto; image-rendering: pixelated; display: block; }
+.qr-code p { margin: 0; padding: 16px; text-align: center; font-size: 14px; }
+.qr-url { font-size: 15px; word-break: break-all; text-align: center; margin: 0; color: var(--muted); }
+.qr-box label { font-weight: 700; font-size: 14px; }
+.qr-box input[type="url"] { width: 100%; font: inherit; font-size: 15px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.qr-row { display: flex; gap: 8px; justify-content: flex-end; }
+
+/* phones: a compact header, so the animation starts high up */
+@media (max-width: 959px) {
+  body { padding-top: 10px; }
+  .app { gap: 10px; }
+  .top { align-items: center; }
+  h1 { font-size: 24px; }
+  .eyebrow { font-size: 11px; }
+  .lead { display: none; }
+  #qrBtn { min-height: 38px; padding: 0 10px; font-size: 13px; }
+  .pages { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+  .pages::-webkit-scrollbar { display: none; }
+  .pages a { flex: none; min-height: 38px; font-size: 14px; }
+}
+@media (max-width: 420px) {
+  .frames .k { font-size: 15px; } .frames .s { font-size: 11px; }
+  .btn { padding: 0 12px; } .eq { font-size: 17px; }
+  .seg label { padding: 6px 9px; }
+  .gsel button { min-width: 30px; padding: 0 6px; font-size: 15px; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="titles">
+      <p class="eyebrow">Physik I · Übung 11</p>
+      <h1 id="h1">Gedämpfte Schwingung</h1>
+      <p class="lead" id="lead"></p>
+    </div>
+    <button class="btn small" id="qrBtn" type="button" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm8-2h2v2h-2v-2zm2 2h2v2h-2v-2zm2-2h4v2h-2v2h-2v-4zm-4 4h2v4h-2v-4zm4 2h4v2h-4v-2zm2-2h2v2h-2v-2z"/></svg>
+      QR-Code
+    </button>
+  </header>
+
+  <nav class="pages" aria-label="Seiten">
+    <a href="#gedaempft" data-page="d"><span class="n">1</span>Gedämpfte Schwingung</a>
+    <a href="#erzwungen" data-page="f"><span class="n">2</span>Erzwungene Schwingung</a>
+    <a href="#wellen" data-page="w"><span class="n">3</span>Wellen</a>
+  </nav>
+
+  <!-- ================= Seite 1: gedämpfte Schwingung ================= -->
+  <main class="layout" data-pg="d">
+    <section class="stage" aria-label="Animation und Graph">
+      <div class="stagewrap">
+        <canvas class="c3 osc" id="d-cv" role="img" aria-label="Federpendel in einer Flüssigkeit und Graph der Auslenkung über der Zeit"></canvas>
+        <div class="gsel" id="d-gsel" role="group" aria-label="Grössen im Graphen"></div>
+        <div class="viewbtns"><button class="ibtn fullBtn" type="button" title="Vollbild" aria-label="Vollbild"></button></div>
+        <div class="ctrls">
+          <button class="ibtn big playBtn" type="button" data-p="d" title="Pause" aria-label="Pause"></button>
+          <button class="ibtn resetBtn" type="button" data-p="d" title="Zurück zum Start" aria-label="Zurück zum Start"></button>
+        </div>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <div class="frames" role="tablist" aria-label="Inhalt wählen">
+        <button type="button" role="tab" data-tab="d-main" aria-selected="true"><span class="k">Versuch</span><span class="s">Einstellungen und Fragen</span></button>
+        <button type="button" role="tab" data-tab="d-dgl" aria-selected="false"><span class="k">DGL lösen</span><span class="s">Die drei Fälle, Schritt für Schritt</span></button>
+      </div>
+
+      <div id="d-main" class="panel">
+        <article class="explain" aria-live="polite">
+          <span class="pill" id="d-pill"></span>
+          <h2 id="d-eTitle"></h2>
+          <p id="d-eText"></p>
+        </article>
+
+        <section class="group" aria-labelledby="d-h-damp">
+          <h3 id="d-h-damp">Dämpfung</h3>
+          <div class="slider"><div class="row"><label for="d-z">Dämpfung <span class="m">δ / ω<sub>0</sub></span></label><output id="d-zOut"></output></div>
+            <input type="range" id="d-z" min="0" max="2.5" step="0.01" value="0.1" aria-describedby="d-zScale">
+            <div class="dscale" id="d-zScale"><span class="z1">Schwingfall</span><span class="mk">Grenzfall</span><span class="z3">Kriechfall</span></div>
+          </div>
+          <div class="presets" aria-label="Dämpfung wählen">
+            <button class="btn small" type="button" data-dz="0">Ungedämpft</button>
+            <button class="btn small" type="button" data-dz="0.1">Schwingfall</button>
+            <button class="btn small" type="button" data-dz="1">Grenzfall</button>
+            <button class="btn small" type="button" data-dz="2">Kriechfall</button>
+          </div>
+          <p class="optnote" id="d-zNote"></p>
+          <label class="chip" style="justify-self:start"><input type="checkbox" id="d-cmp"><span class="lbl">Alle drei Fälle im Graphen vergleichen</span></label>
+          <div class="legend" id="d-cmpLegend" hidden>
+            <span><i style="background:var(--k1)"></i>Schwingfall, δ = 0.2 ω₀</span>
+            <span><i style="background:var(--k2)"></i>Grenzfall, δ = ω₀</span>
+            <span><i style="background:var(--k3)"></i>Kriechfall, δ = 2 ω₀</span>
+          </div>
+        </section>
+
+        <section class="group" aria-labelledby="d-h-set">
+          <h3 id="d-h-set">Pendel</h3>
+          <div class="slider"><div class="row"><label for="d-m">Masse <span class="m">m</span></label><output id="d-mOut"></output></div><input type="range" id="d-m" min="0.1" max="1" step="0.05" value="0.5"></div>
+          <div class="slider"><div class="row"><label for="d-D">Federkonstante <span class="m">D</span></label><output id="d-DOut"></output></div><input type="range" id="d-D" min="5" max="50" step="1" value="20"></div>
+          <div class="slider"><div class="row"><label for="d-x0">Startauslenkung <span class="m">x(0)</span></label><output id="d-x0Out"></output></div><input type="range" id="d-x0" min="-0.15" max="0.15" step="0.01" value="0.1"></div>
+          <div class="slider"><div class="row"><label for="d-v0">Startgeschwindigkeit <span class="m">v(0)</span></label><output id="d-v0Out"></output></div><input type="range" id="d-v0" min="-1" max="1" step="0.05" value="0"></div>
+          <label class="chip" style="justify-self:start"><input type="checkbox" id="d-grav" checked><span class="lbl">Schwerkraft (senkrechtes Pendel)</span></label>
+          <div class="slider">
+            <div class="row"><span class="lab" id="d-tempoLbl">Tempo</span></div>
+            <div class="seg" role="radiogroup" aria-labelledby="d-tempoLbl">
+              <label><input type="radio" name="d-tempo" value="0.1">0.1×</label>
+              <label><input type="radio" name="d-tempo" value="0.25">0.25×</label>
+              <label><input type="radio" name="d-tempo" value="0.5" checked>0.5×</label>
+              <label><input type="radio" name="d-tempo" value="1">1×</label>
+            </div>
+          </div>
+          <div class="presets"><button class="btn small" type="button" id="d-defaults">Werte zurücksetzen</button></div>
+        </section>
+
+        <section class="group" aria-labelledby="d-h-show">
+          <h3 id="d-h-show">Anzeigen</h3>
+          <div class="chips">
+            <label class="chip"><input type="checkbox" id="d-pen" checked><span class="lbl">Masse schreibt die Kurve</span></label>
+            <label class="chip"><input type="checkbox" id="d-sol" checked><span class="lbl">Formel-Lösung</span></label>
+            <label class="chip"><input type="checkbox" id="d-env" checked><span class="lbl">Einhüllende <span class="m">e<sup>−δt</sup></span></span></label>
+            <label class="chip"><input type="checkbox" id="d-F" checked><span class="lbl">Kräfte</span></label>
+            <label class="chip"><input type="checkbox" id="d-V" checked><span class="lbl">Geschwindigkeit</span></label>
+          </div>
+          <p class="note" id="d-showNote"></p>
+        </section>
+
+        <section class="group" aria-labelledby="d-h-num">
+          <h3 id="d-h-num">Messwerte</h3>
+          <div class="tablewrap"><table><tbody id="d-num"></tbody></table></div>
+        </section>
+
+        <section class="group" aria-labelledby="d-h-eq">
+          <h3 id="d-h-eq">Gedämpfte Schwingung</h3>
+          <div id="d-eq" class="dblock"></div>
+        </section>
+
+        <section class="group" aria-labelledby="d-h-try">
+          <h3 id="d-h-try">Zum Ausprobieren</h3>
+          <div id="d-try"></div>
+          <p class="foot" id="d-foot"></p>
+        </section>
+      </div>
+
+      <div id="d-dgl" class="panel" hidden><div id="d-dglBox" class="panel"></div></div>
+    </aside>
+  </main>
+
+  <!-- ================= Seite 2: erzwungene Schwingung ================= -->
+  <main class="layout" data-pg="f" hidden>
+    <section class="stage" aria-label="Animation und Graphen">
+      <div class="stagewrap">
+        <canvas class="c3 tall" id="f-cv" role="img" aria-label="Angetriebenes Federpendel, Resonanzkurve und Graph der Auslenkung über der Zeit"></canvas>
+        <div class="gsel" id="f-gsel" role="group" aria-label="Kurven im Resonanzdiagramm"></div>
+        <div class="viewbtns"><button class="ibtn fullBtn" type="button" title="Vollbild" aria-label="Vollbild"></button></div>
+        <div class="ctrls">
+          <button class="ibtn big playBtn" type="button" data-p="f" title="Pause" aria-label="Pause"></button>
+          <button class="ibtn resetBtn" type="button" data-p="f" title="Zurück zum Start" aria-label="Zurück zum Start"></button>
+        </div>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <div class="frames" role="tablist" aria-label="Inhalt wählen">
+        <button type="button" role="tab" data-tab="f-main" aria-selected="true"><span class="k">Versuch</span><span class="s">Einstellungen und Fragen</span></button>
+        <button type="button" role="tab" data-tab="f-dgl" aria-selected="false"><span class="k">Lösung</span><span class="s">Resonanzkurve herleiten</span></button>
+      </div>
+
+      <div id="f-main" class="panel">
+        <article class="explain" aria-live="polite">
+          <span class="pill" id="f-pill"></span>
+          <h2 id="f-eTitle"></h2>
+          <p id="f-eText"></p>
+        </article>
+
+        <section class="group" aria-labelledby="f-h-drv">
+          <h3 id="f-h-drv">Antrieb</h3>
+          <div class="slider"><div class="row"><label for="f-r">Antriebsfrequenz <span class="m">Ω / ω<sub>0</sub></span></label><output id="f-rOut"></output></div>
+            <input type="range" id="f-r" min="0.1" max="3" step="0.01" value="0.5" aria-describedby="f-rScale">
+            <div class="dscale plain" id="f-rScale" style="--p:31.03%"><span class="z1">langsam</span><span class="mk">ω₀</span><span class="z3">schnell</span></div>
+          </div>
+          <div class="presets" aria-label="Antriebsfrequenz wählen">
+            <button class="btn small" type="button" data-fr="0.3">Ω = 0.3 ω₀</button>
+            <button class="btn small" type="button" data-fr="res">Resonanz</button>
+            <button class="btn small" type="button" data-fr="2">Ω = 2 ω₀</button>
+          </div>
+          <div class="presets"><button class="btn small" type="button" id="f-sweep" aria-pressed="false">Ω langsam durchfahren</button></div>
+          <p class="note">Du kannst Ω auch direkt im Resonanzdiagramm oben einstellen: hineinklicken oder ziehen.</p>
+        </section>
+
+        <section class="group" aria-labelledby="f-h-damp">
+          <h3 id="f-h-damp">Dämpfung</h3>
+          <div class="slider"><div class="row"><label for="f-z">Dämpfung <span class="m">δ / ω<sub>0</sub></span></label><output id="f-zOut"></output></div>
+            <input type="range" id="f-z" min="0.03" max="1" step="0.01" value="0.1"></div>
+          <div class="presets" aria-label="Dämpfung wählen">
+            <button class="btn small" type="button" data-fz="0.05">Schwach</button>
+            <button class="btn small" type="button" data-fz="0.15">Mittel</button>
+            <button class="btn small" type="button" data-fz="0.5">Stark</button>
+          </div>
+          <p class="optnote" id="f-zNote"></p>
+          <div class="slider">
+            <div class="row"><span class="lab" id="f-tempoLbl">Tempo</span></div>
+            <div class="seg" role="radiogroup" aria-labelledby="f-tempoLbl">
+              <label><input type="radio" name="f-tempo" value="0.5">0.5×</label>
+              <label><input type="radio" name="f-tempo" value="1" checked>1×</label>
+              <label><input type="radio" name="f-tempo" value="2">2×</label>
+              <label><input type="radio" name="f-tempo" value="4">4×</label>
+            </div>
+          </div>
+        </section>
+
+        <section class="group" aria-labelledby="f-h-show">
+          <h3 id="f-h-show">Anzeigen</h3>
+          <div class="chips">
+            <label class="chip"><input type="checkbox" id="f-sol" checked><span class="lbl">Eingeschwungene Lösung <span class="m">x<sub>∞</sub>(t)</span></span></label>
+            <label class="chip"><input type="checkbox" id="f-fam"><span class="lbl">Kurven für andere Dämpfungen</span></label>
+            <label class="chip"><input type="checkbox" id="f-F"><span class="lbl">Kräfte</span></label>
+          </div>
+          <p class="note" id="f-measNote"></p>
+          <div class="presets"><button class="btn small" type="button" id="f-clear">Messpunkte löschen</button></div>
+        </section>
+
+        <section class="group" aria-labelledby="f-h-num">
+          <h3 id="f-h-num">Messwerte</h3>
+          <div class="tablewrap"><table><tbody id="f-num"></tbody></table></div>
+        </section>
+
+        <section class="group" aria-labelledby="f-h-eq">
+          <h3 id="f-h-eq">Erzwungene Schwingung</h3>
+          <div id="f-eq" class="dblock"></div>
+        </section>
+
+        <section class="group" aria-labelledby="f-h-try">
+          <h3 id="f-h-try">Zum Ausprobieren</h3>
+          <div id="f-try"></div>
+          <p class="foot" id="f-foot"></p>
+        </section>
+      </div>
+
+      <div id="f-dgl" class="panel" hidden><div id="f-dglBox" class="panel"></div></div>
+    </aside>
+  </main>
+
+  <!-- ================= Seite 3: Wellen ================= -->
+  <main class="layout" data-pg="w" hidden>
+    <section class="stage" aria-label="Seil und Ort-Zeit-Bild">
+      <div class="stagewrap">
+        <canvas class="c3 tall" id="w-cv" role="img" aria-label="Zwei Wellen auf einem Seil und darunter ihr Verlauf über der Zeit"></canvas>
+        <div class="gsel" id="w-gsel" role="radiogroup" aria-label="Unteres Diagramm"></div>
+        <div class="viewbtns"><button class="ibtn fullBtn" type="button" title="Vollbild" aria-label="Vollbild"></button></div>
+        <div class="ctrls">
+          <button class="ibtn big playBtn" type="button" data-p="w" title="Pause" aria-label="Pause"></button>
+          <button class="ibtn resetBtn" type="button" data-p="w" title="Zurück zum Start" aria-label="Zurück zum Start"></button>
+        </div>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <div class="frames" role="tablist" aria-label="Inhalt wählen">
+        <button type="button" role="tab" data-tab="w-main" aria-selected="true"><span class="k">Versuch</span><span class="s">Einstellungen und Fragen</span></button>
+        <button type="button" role="tab" data-tab="w-dgl" aria-selected="false"><span class="k">Wellengleichung</span><span class="s">Warum sich Wellen addieren</span></button>
+      </div>
+
+      <div id="w-main" class="panel">
+        <article class="explain" aria-live="polite">
+          <span class="pill" id="w-pill"></span>
+          <h2 id="w-eTitle"></h2>
+          <p id="w-eText"></p>
+        </article>
+
+        <section class="group" aria-labelledby="w-h-pre">
+          <h3 id="w-h-pre">Was soll sich begegnen?</h3>
+          <div class="presets" aria-label="Szenario wählen">
+            <button class="btn small" type="button" data-wp="versch">Verschiedene Pulse</button>
+            <button class="btn small" type="button" data-wp="berge">Zwei Berge</button>
+            <button class="btn small" type="button" data-wp="bergtal">Berg und Tal</button>
+            <button class="btn small" type="button" data-wp="zuege">Wellenzüge</button>
+            <button class="btn small" type="button" data-wp="stehend">Stehende Welle</button>
+          </div>
+        </section>
+
+        <section class="group" aria-labelledby="w-h-time">
+          <h3 id="w-h-time">Zeit</h3>
+          <div class="slider"><div class="row"><label for="w-t">Zeit <span class="m">t</span></label><output id="w-tOut"></output></div>
+            <input type="range" id="w-t" min="0" max="6" step="0.01" value="0"></div>
+          <div class="presets">
+            <button class="btn small" type="button" id="w-back" aria-label="0.05 Sekunden zurück">− 0.05 s</button>
+            <button class="btn small" type="button" id="w-fwd" aria-label="0.05 Sekunden vor">+ 0.05 s</button>
+          </div>
+          <div class="slider">
+            <div class="row"><span class="lab" id="w-tempoLbl">Tempo</span></div>
+            <div class="seg" role="radiogroup" aria-labelledby="w-tempoLbl">
+              <label><input type="radio" name="w-tempo" value="0.1">0.1×</label>
+              <label><input type="radio" name="w-tempo" value="0.25">0.25×</label>
+              <label><input type="radio" name="w-tempo" value="0.5" checked>0.5×</label>
+              <label><input type="radio" name="w-tempo" value="1">1×</label>
+            </div>
+          </div>
+          <p class="note">Ziehe die Zeit hin und her, um die Begegnung genau anzuschauen. Ein Klick ins Ort-Zeit-Bild springt zu diesem Zeitpunkt.</p>
+        </section>
+
+        <section class="group" aria-labelledby="w-h-1">
+          <h3 id="w-h-1"><span class="dot" style="background:var(--w1)"></span>Welle 1, kommt von links</h3>
+          <label class="chip" style="justify-self:start"><input type="checkbox" id="w1on" checked><span class="lbl">Welle 1 an</span></label>
+          <div class="seg" role="radiogroup" aria-label="Form von Welle 1">
+            <label><input type="radio" name="w1form" value="puls" checked>Puls</label>
+            <label><input type="radio" name="w1form" value="zug">Wellenzug</label>
+            <label><input type="radio" name="w1form" value="dauer">Dauerwelle</label>
+          </div>
+          <div class="slider"><div class="row"><label for="w1A">Amplitude <span class="m">A<sub>1</sub></span></label><output id="w1AOut"></output></div><input type="range" id="w1A" min="-20" max="20" step="1" value="16"></div>
+          <div class="slider"><div class="row"><label for="w1L" id="w1LLab">Breite <span class="m">b<sub>1</sub></span></label><output id="w1LOut"></output></div><input type="range" id="w1L" min="0.4" max="4" step="0.1" value="1.2"></div>
+          <div class="slider" id="w1nRow" hidden><div class="row"><label for="w1n">Anzahl Wellenlängen</label><output id="w1nOut"></output></div><input type="range" id="w1n" min="1" max="5" step="1" value="3"></div>
+          <p class="note" id="w1info"></p>
+        </section>
+
+        <section class="group" aria-labelledby="w-h-2">
+          <h3 id="w-h-2"><span class="dot" style="background:var(--w2)"></span>Welle 2, kommt von rechts</h3>
+          <label class="chip" style="justify-self:start"><input type="checkbox" id="w2on" checked><span class="lbl">Welle 2 an</span></label>
+          <div class="seg" role="radiogroup" aria-label="Form von Welle 2">
+            <label><input type="radio" name="w2form" value="puls" checked>Puls</label>
+            <label><input type="radio" name="w2form" value="zug">Wellenzug</label>
+            <label><input type="radio" name="w2form" value="dauer">Dauerwelle</label>
+          </div>
+          <div class="slider"><div class="row"><label for="w2A">Amplitude <span class="m">A<sub>2</sub></span></label><output id="w2AOut"></output></div><input type="range" id="w2A" min="-20" max="20" step="1" value="9"></div>
+          <div class="slider"><div class="row"><label for="w2L" id="w2LLab">Breite <span class="m">b<sub>2</sub></span></label><output id="w2LOut"></output></div><input type="range" id="w2L" min="0.4" max="4" step="0.1" value="2.4"></div>
+          <div class="slider" id="w2nRow" hidden><div class="row"><label for="w2n">Anzahl Wellenlängen</label><output id="w2nOut"></output></div><input type="range" id="w2n" min="1" max="5" step="1" value="3"></div>
+          <p class="note" id="w2info"></p>
+        </section>
+
+        <section class="group" aria-labelledby="w-h-rope">
+          <h3 id="w-h-rope">Seil</h3>
+          <div class="slider"><div class="row"><label for="w-c">Wellengeschwindigkeit <span class="m">c</span></label><output id="w-cOut"></output></div><input type="range" id="w-c" min="0.5" max="4" step="0.1" value="2"></div>
+          <div class="slider"><div class="row"><label for="w-xT">Treffpunkt der Wellenfronten</label><output id="w-xTOut"></output></div><input type="range" id="w-xT" min="1" max="7" step="0.1" value="4"></div>
+          <div class="slider"><div class="row"><label for="w-xP">Ort des Punktes <span class="m">P</span></label><output id="w-xPOut"></output></div><input type="range" id="w-xP" min="0" max="8" step="0.05" value="2"></div>
+        </section>
+
+        <section class="group" aria-labelledby="w-h-show">
+          <h3 id="w-h-show">Anzeigen</h3>
+          <div class="chips">
+            <label class="chip"><input type="checkbox" id="w-comp" checked><span class="lbl">Einzelne Wellen gestrichelt</span></label>
+            <label class="chip"><input type="checkbox" id="w-beads"><span class="lbl">Seilstücke</span></label>
+            <label class="chip"><input type="checkbox" id="w-vel"><span class="lbl">Geschwindigkeit der Seilstücke</span></label>
+          </div>
+          <p class="note">Oben: das Seil als „Foto“ zum Zeitpunkt <span class="m">t</span>. Unten wählst du auf dem Bild zwischen dem Ort-Zeit-Bild (jede Zeile ist ein Foto, die Zeit läuft nach unten, grün ist ein Berg, orange ein Tal) und der Bewegung des Punktes <span class="m">P</span> über der Zeit. <span class="m">P</span> lässt sich oben auf dem Seil verschieben.</p>
+        </section>
+
+        <section class="group" aria-labelledby="w-h-num">
+          <h3 id="w-h-num">Messwerte</h3>
+          <div class="tablewrap"><table><tbody id="w-num"></tbody></table></div>
+          <div class="tablewrap"><table><thead><tr><th scope="col" style="text-align:left">Grösse</th><th scope="col"><span class="t-w1">Welle 1</span></th><th scope="col"><span class="t-w2">Welle 2</span></th></tr></thead><tbody id="w-wtab"></tbody></table></div>
+        </section>
+
+        <section class="group" aria-labelledby="w-h-eq">
+          <h3 id="w-h-eq">Wellen</h3>
+          <div id="w-eq" class="dblock"></div>
+        </section>
+
+        <section class="group" aria-labelledby="w-h-try">
+          <h3 id="w-h-try">Zum Ausprobieren</h3>
+          <div id="w-try"></div>
+          <p class="foot" id="w-foot"></p>
+        </section>
+      </div>
+
+      <div id="w-dgl" class="panel" hidden><div id="w-dglBox" class="panel"></div></div>
+    </aside>
+  </main>
+</div>
+
+<div class="qr-overlay" id="qr" hidden role="dialog" aria-modal="true" aria-labelledby="qrTitle">
+  <div class="qr-box">
+    <h2 id="qrTitle">Mit dem Handy öffnen</h2>
+    <div class="qr-code" id="qrCode"></div>
+    <p class="qr-url" id="qrUrlText"></p>
+    <label for="qrUrl">Adresse dieser Seite</label>
+    <input type="url" id="qrUrl" placeholder="https://…" autocomplete="off" spellcheck="false">
+    <div class="qr-row"><button class="btn small" id="qrClose" type="button">Schliessen</button></div>
+  </div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  // Address put into the QR code when the page runs inside a frame (e.g. the claude.ai viewer).
+  // Hosted on its own, the page uses its own address. Put the GitHub Pages address here.
+  const SHARE_URL = 'https://david-1-2-3.github.io/schwingungen-wellen/';
+
+  const $ = s => document.querySelector(s);
+  const $$ = s => [...document.querySelectorAll(s)];
+  const MATH = '"STIX Two Text", "Cambria Math", "Times New Roman", serif';
+  const BODY = '"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif';
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  const DEG = 180 / Math.PI, TAU = 2 * Math.PI;
+  const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function fmt(v, d = 0) {
+    if (!isFinite(v)) return '—';
+    if (Math.abs(v) < 0.5 * Math.pow(10, -d)) v = 0;
+    return v.toLocaleString('de-CH', { minimumFractionDigits: d, maximumFractionDigits: d }).replace('-', '−');
+  }
+  const D1 = s => `<span class="dt">${s}</span>`;     // one dot: first time derivative
+  const D2 = s => `<span class="dt2">${s}</span>`;    // two dots: second time derivative
+  const M = s => `<span class="m">${s}</span>`;
+  const W0 = 'ω<sub>0</sub>';
+  const eqn = (f, s = '') => `<div class="eq"><span class="term">${M(f)}${s ? `<small>${s}</small>` : ''}</span></div>`;
+  const eqs = (...t) => `<div class="eq">${t.map(([f, s]) => `<span class="term">${M(f)}${s ? `<small>${s}</small>` : ''}</span>`).join('')}</div>`;
+  const stepBox = (n, body) => `<div class="step"><span class="num">${n}</span><div>${body}</div></div>`;
+  const detailsList = T => T.map(([q, a]) => `<details><summary>${q}</summary><p>${a}</p></details>`).join('');
+  const tableRows = rows => rows.map(r => `<tr><th scope="row">${r[0]}<span class="u">${r[1]}</span></th><td>${r[2]}</td></tr>`).join('');
+  function setHTML(el, html) { if (el.dataset.h !== html) { el.innerHTML = html; el.dataset.h = html; } }
+  function niceCeil(v) {
+    const e = Math.pow(10, Math.floor(Math.log10(v)));
+    for (const s of [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]) if (s * e >= v * (1 - 1e-9)) return s * e;
+    return 10 * e;
+  }
+
+  /* ---------- colours and canvas helpers ---------- */
+  const C = {}, RGB = {};
+  const TOKENS = ['floor', 'grid', 'grid2', 'mark', 'muted', 'ink', 'halo', 'surface', 'accent', 'block', 'blockedge', 'spring', 'equi',
+    'ffield', 'ekin', 'epot', 'heat', 'cx', 'cv', 'ca', 'cF', 'line', 'drv', 'phs', 'fluid', 'k1', 'k2', 'k3', 'w1', 'w2', 'pos', 'neg'];
+  const PG = {};
+  function toRGB(s) {
+    s = (s || '').trim();
+    if (s[0] === '#') {
+      if (s.length === 4) s = '#' + s[1] + s[1] + s[2] + s[2] + s[3] + s[3];
+      const n = parseInt(s.slice(1, 7), 16);
+      return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+    }
+    const m = s.match(/[\d.]+/g);
+    return m ? m.slice(0, 3).map(Number) : [128, 128, 128];
+  }
+  function readColors() {
+    const cs = getComputedStyle(document.documentElement);
+    for (const k of TOKENS) { C[k] = cs.getPropertyValue('--' + k).trim(); RGB[k] = toRGB(C[k]); }
+    for (const p of Object.values(PG)) p.S.dirty = true;
+  }
+  function fit(cv) {
+    const r = cv.getBoundingClientRect(), d = window.devicePixelRatio || 1;
+    const w = Math.max(1, Math.round(r.width * d)), h = Math.max(1, Math.round(r.height * d));
+    if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+    const ctx = cv.getContext('2d');
+    ctx.setTransform(d, 0, 0, d, 0, 0);
+    return { ctx, w: r.width, h: r.height };
+  }
+  function arrow(ctx, x0, y0, dx, dy, col, lw) {
+    const L = Math.hypot(dx, dy);
+    if (L < 3) return false;
+    const ux = dx / L, uy = dy / L, hl = Math.min(L * 0.55, lw * 3.6), hw = hl * 0.55;
+    const tx = x0 + dx, ty = y0 + dy, bx = tx - ux * hl, by = ty - uy * hl;
+    const headPath = () => { ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(bx - uy * hw, by + ux * hw); ctx.lineTo(bx + uy * hw, by - ux * hw); ctx.closePath(); };
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.strokeStyle = C.halo; ctx.lineWidth = lw + 3;
+    ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(bx, by); ctx.stroke();
+    ctx.lineWidth = 3; headPath(); ctx.stroke();
+    ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = lw;
+    ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(bx + ux, by + uy); ctx.stroke();
+    headPath(); ctx.fill();
+    return true;
+  }
+  function text(ctx, s, x, y, col, font, align = 'center', base = 'middle') {
+    ctx.save(); ctx.font = font; ctx.textAlign = align; ctx.textBaseline = base;
+    ctx.lineJoin = 'round'; ctx.strokeStyle = C.halo; ctx.lineWidth = 4; ctx.strokeText(s, x, y);
+    ctx.fillStyle = col; ctx.fillText(s, x, y); ctx.restore();
+  }
+  // italic symbol with an optional subscript, e.g. F_D
+  function sym(ctx, x, y, s, sub, col, fs = 15) {
+    ctx.save(); ctx.textBaseline = 'middle'; ctx.lineJoin = 'round';
+    ctx.font = `italic ${fs}px ${MATH}`; const w1 = ctx.measureText(s).width;
+    ctx.strokeStyle = C.halo; ctx.lineWidth = 4; ctx.fillStyle = col;
+    ctx.strokeText(s, x, y); ctx.fillText(s, x, y);
+    if (sub) { ctx.font = `italic ${Math.round(fs * 0.68)}px ${MATH}`; ctx.strokeText(sub, x + w1 + 1, y + fs * 0.3); ctx.fillText(sub, x + w1 + 1, y + fs * 0.3); }
+    ctx.restore();
+  }
+  function drawCeiling(ctx, cx, y, hw) {
+    ctx.fillStyle = C.mark; ctx.fillRect(cx - hw, y - 5, 2 * hw, 5);
+    ctx.strokeStyle = C.mark; ctx.lineWidth = 1.5;
+    const n = Math.max(4, Math.round(2 * hw / 14));
+    for (let i = 0; i < n; i++) { const x = cx - hw + 4 + i * (2 * hw - 8) / n; ctx.beginPath(); ctx.moveTo(x, y - 5); ctx.lineTo(x + 7, y - 13); ctx.stroke(); }
+  }
+  function drawSpring(ctx, cx, top, bot, sw, nz = 14) {
+    ctx.strokeStyle = C.spring; ctx.lineWidth = 2.6; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(cx, top); ctx.lineTo(cx, top + 8);
+    for (let i = 1; i < nz; i++) ctx.lineTo(cx + (i % 2 ? sw : -sw), top + 8 + (bot - top - 16) * i / nz);
+    ctx.lineTo(cx, bot - 8); ctx.lineTo(cx, bot); ctx.stroke();
+  }
+  function drawMass(ctx, cx, mY, bs) {
+    ctx.fillStyle = C.mark; ctx.fillRect(cx - bs / 2, mY - bs / 2, bs, bs);
+    ctx.fillStyle = C.surface; ctx.font = `700 ${Math.round(bs * 0.45)}px ${BODY}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('m', cx, mY + 1);
+  }
+  // a beaker of viscous liquid around the path of the mass: the darker, the stronger the damping
+  function drawTank(ctx, cx, y0, y1, hw, zeta) {
+    if (zeta <= 0) return;
+    ctx.save();
+    ctx.globalAlpha = clamp(0.1 + 0.2 * Math.min(zeta, 2.5), 0.1, 0.6);
+    ctx.fillStyle = C.fluid; ctx.fillRect(cx - hw, y0, 2 * hw, y1 - y0);
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = C.fluid; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(cx - hw, y0); ctx.lineTo(cx + hw, y0); ctx.stroke();
+    ctx.strokeStyle = C.mark; ctx.lineWidth = 2; ctx.lineJoin = 'miter';
+    ctx.beginPath(); ctx.moveTo(cx - hw, y0 - 8); ctx.lineTo(cx - hw, y1); ctx.lineTo(cx + hw, y1); ctx.lineTo(cx + hw, y0 - 8); ctx.stroke();
+    ctx.restore();
+    const name = zeta < 0.35 ? 'Wasser' : zeta < 1 ? 'Öl' : 'Honig';
+    text(ctx, name, cx - hw + 3, y0 - 10, C.muted, `11px ${BODY}`, 'left');
+  }
+  // time axis with ticks at least 44 px apart
+  function timeTicks(ctx, X, tw0, tw1, pps, gx0, gx1, gy0, gy1) {
+    const tStep = [0.25, 0.5, 1, 2, 5].find(s => s * pps >= 44) || 5;
+    ctx.fillStyle = C.muted; ctx.font = `12px ${BODY}`; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    for (let t = Math.ceil(tw0 / tStep) * tStep; t <= tw1 + 1e-9; t += tStep) {
+      const x = X(t); if (x < gx0 + 8 || x > gx1 - 34) continue;
+      ctx.fillText(fmt(t, tStep < 1 ? (tStep < 0.5 ? 2 : 1) : 0), x, gy1 + 5);
+      ctx.strokeStyle = C.grid; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x, gy0); ctx.lineTo(x, gy1); ctx.stroke();
+    }
+    text(ctx, 't / s', gx1, gy1 + 13, C.ink, `italic 13px ${MATH}`, 'right', 'top');
+  }
+  const ICON = {
+    pause: '<svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>',
+    play: '<svg class="i-play" hidden viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.5.9l12-7.5a1 1 0 0 0 0-1.8l-12-7.5A1 1 0 0 0 7 4.5z"/></svg>',
+    reset: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/></svg>',
+    full: '<svg class="i-full" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>',
+    exit: '<svg class="i-exit" hidden viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5"/></svg>',
+  };
+  $$('.playBtn').forEach(b => { b.innerHTML = ICON.pause + ICON.play; });
+  $$('.resetBtn').forEach(b => { b.innerHTML = ICON.reset; });
+  $$('.fullBtn').forEach(b => { b.innerHTML = ICON.full + ICON.exit; });
+  function syncPlay(key) {
+    const b = $(`.playBtn[data-p="${key}"]`), run = PG[key].S.run;
+    b.querySelector('.i-pause').toggleAttribute('hidden', !run); b.querySelector('.i-play').toggleAttribute('hidden', run);
+    b.title = run ? 'Pause' : 'Start'; b.setAttribute('aria-label', b.title);
+  }
+
+  /* =====================================================================
+     Seite 1: gedämpfte Schwingung (Federpendel wie in Übung 10, mit Dämpfung)
+     ===================================================================== */
+  PG.d = (() => {
+    const cv = $('#d-cv'), gsel = $('#d-gsel');
+    const G0 = 9.81;
+    const DEF = { m: 0.5, D: 20, x0: 0.1, v0: 0, grav: true, zeta: 0.1 };
+    const S = {
+      p: { m: DEF.m, D: DEF.D, x0: DEF.x0, v0: DEF.v0, grav: DEF.grav }, zeta: DEF.zeta, delta: 0, tempo: 0.5, run: true, dirty: true,
+      gs: { x: true, v: false, a: false, E: false },
+      show: { pen: true, sol: true, env: true, cmp: false, F: true, V: true },
+      t: 0, y: 0, v: 0, y0: 0, vv0: 0, hist: [], cross: [], Tm: null, lastHist: -1, E0: 1, A0: 0.1, maxima: [],
+    };
+    const CMP = [{ z: 0.2, col: 'k1', lab: 'Schwingfall' }, { z: 1, col: 'k2', lab: 'Grenzfall' }, { z: 2, col: 'k3', lab: 'Kriechfall' }];
+    const w0 = () => Math.sqrt(S.p.D / S.p.m);
+    const T0 = () => TAU / w0();
+    const wdN = () => Math.sqrt(Math.max(0, w0() ** 2 - S.delta ** 2));
+    const shift = () => S.p.grav ? S.p.m * G0 / S.p.D : 0;   // the rest position moves down by m g / D
+    const bco = () => 2 * S.p.m * S.delta;                      // friction coefficient b = 2 m δ
+    const acc = (y, v) => -(S.p.D / S.p.m) * y - 2 * S.delta * v;
+    const energies = (y, v) => ({ k: 0.5 * S.p.m * v * v, p: 0.5 * S.p.D * y * y });
+    const windowLen = () => clamp(4 * T0(), 3, 10);
+    const kind = () => S.zeta === 0 ? 0 : S.zeta < 1 ? 1 : S.zeta === 1 ? 2 : 3;   // ungedämpft, Schwingfall, Grenzfall, Kriechfall
+
+    // the solution as a formula, for any damping δ, with the start values
+    function formula(t, d = S.delta) {
+      const w = w0(), y0 = S.y0, v0 = S.vv0;
+      if (d < w - 1e-9) { const wd = Math.sqrt(w * w - d * d); return Math.exp(-d * t) * (y0 * Math.cos(wd * t) + (v0 + d * y0) / wd * Math.sin(wd * t)); }
+      if (Math.abs(d - w) <= 1e-9) return Math.exp(-d * t) * (y0 + (v0 + d * y0) * t);
+      const s = Math.sqrt(d * d - w * w), r1 = -d + s, r2 = -d - s, c1 = (v0 - r2 * y0) / (r1 - r2);
+      return c1 * Math.exp(r1 * t) + (y0 - c1) * Math.exp(r2 * t);
+    }
+    function reset() {
+      S.delta = S.zeta * w0();   // δ follows ω0, so the kind of damping stays the same when m or D change
+      S.y0 = S.p.x0; S.vv0 = S.p.v0;
+      S.y = S.y0; S.v = S.vv0; S.t = 0; S.cross = []; S.Tm = null; S.lastHist = -1; S.maxima = [];
+      S.A0 = Math.max(0.01, Math.hypot(S.y0, S.vv0 / w0()));
+      const e = energies(S.y, S.v); S.E0 = Math.max(1e-9, e.k + e.p);
+      S.hist = []; record();
+      S.dirty = true; ui(true);
+    }
+    function record() {
+      const a = acc(S.y, S.v), e = energies(S.y, S.v);
+      S.hist.push([S.t, S.y, S.v, a, e.k, e.p]);
+      const keep = S.t - windowLen() - 0.5;
+      while (S.hist.length && S.hist[0][0] < keep) S.hist.shift();
+    }
+    function step(dt) {
+      const n = Math.max(1, Math.ceil(dt / 0.0005)), h = dt / n;
+      for (let i = 0; i < n; i++) {
+        const y = S.y, v = S.v;
+        const k1y = v, k1v = acc(y, v);
+        const k2y = v + h / 2 * k1v, k2v = acc(y + h / 2 * k1y, k2y);
+        const k3y = v + h / 2 * k2v, k3v = acc(y + h / 2 * k2y, k3y);
+        const k4y = v + h * k3v, k4v = acc(y + h * k3y, k4y);
+        S.y = y + h / 6 * (k1y + 2 * k2y + 2 * k3y + k4y);
+        S.v = v + h / 6 * (k1v + 2 * k2v + 2 * k3v + k4v);
+        // upward zero crossings give the measured period
+        if (y < 0 && S.y >= 0) {
+          const tc = S.t + h * (-y / (S.y - y));
+          S.cross.push(tc);
+          if (S.cross.length > 1) S.Tm = S.cross[S.cross.length - 1] - S.cross[S.cross.length - 2];
+          if (S.cross.length > 6) S.cross.shift();
+        }
+        // upper turning points give the ratio of two maxima
+        if (v > 0 && S.v <= 0 && S.y > 0) {
+          S.maxima.push([S.t + h * v / (v - S.v), S.y]);
+          if (S.maxima.length > 4) S.maxima.shift();
+        }
+        S.t += h;
+      }
+      if (S.t - S.lastHist >= 0.008) { S.lastHist = S.t; record(); }
+      S.dirty = true;
+    }
+
+    /* ---------- drawing ---------- */
+    const QCOL = { x: 'cx', v: 'cv', a: 'ca' };
+    function draw() {
+      const { ctx, w, h } = fit(cv);
+      ctx.clearRect(0, 0, w, h);
+      const aw = Math.round(w * (w < 520 ? 0.36 : 0.32));
+      gsel.style.left = (aw + 6) + 'px';
+      const top0 = 60;   // the band above holds the buttons
+      const onlyE = S.gs.E && !S.gs.x && !S.gs.v && !S.gs.a;
+      const gx0 = aw + 46, gx1 = w - (S.gs.E && !onlyE ? 48 : 16), gy0 = top0 + 8, gy1 = h - 30;
+      const yMid = (gy0 + gy1) / 2, half = 0.32 * (gy1 - gy0);
+      // pen mode: the mass writes the curve; the newest point is at the left edge, the paper runs to the right
+      const pen = S.show.pen;
+      const W = windowLen(), tw0 = pen ? Math.max(0, S.t - W) : Math.max(0, S.t - W * 0.92), tw1 = pen ? S.t : tw0 + W;
+      const X = pen ? t => gx0 + (S.t - t) / W * (gx1 - gx0) : t => gx0 + (t - tw0) / W * (gx1 - gx0);
+      const tEndCurve = pen ? S.t : tw1;
+
+      ctx.strokeStyle = C.grid2; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(aw, 12); ctx.lineTo(aw, h - 12); ctx.stroke();
+
+      const kx = half / S.A0;   // pixels per metre, shared by the animation and the x graph
+      const w_ = w0(), vref = S.A0 * w_;
+
+      /* ---- animation ---- */
+      const cx = aw * 0.42, mY = yMid - S.y * kx, bs = clamp(aw * 0.2, 26, 44);
+      const hw = Math.min(bs * 1.35, cx - 6);
+      drawTank(ctx, cx, yMid - half - bs / 2 - 14, yMid + half + bs / 2 + 10, hw, S.zeta);
+      drawCeiling(ctx, cx, top0, aw * 0.3);
+      drawSpring(ctx, cx, top0, mY - bs / 2, clamp(aw * 0.09, 9, 16));
+      ctx.setLineDash([3, 4]); ctx.strokeStyle = C.equi; ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.moveTo(8, yMid); ctx.lineTo(S.gs.x ? gx1 : aw, yMid); ctx.stroke();
+      const yr = yMid - shift() * kx, showR = S.p.grav && yr > top0 + 6;
+      if (showR) { ctx.beginPath(); ctx.moveTo(8, yr); ctx.lineTo(aw - 8, yr); ctx.stroke(); }
+      ctx.setLineDash([]);
+      text(ctx, 'x = 0', aw - 8, yMid - 9, C.muted, `italic 12px ${MATH}`, 'right');
+      if (showR) text(ctx, 'entspannt', aw - 8, yr - 9, C.muted, `11px ${BODY}`, 'right');
+      drawMass(ctx, cx, mY, bs);
+      const xr = cx + bs * 0.95;   // velocity and friction sit on the same line: they always point opposite ways
+      if (S.show.F) {
+        const FD = S.p.D * (shift() - S.y), FG = S.p.grav ? S.p.m * G0 : 0, FW = -bco() * S.v;
+        const Fref = Math.max(S.p.D * S.A0, FG, 1e-6), kF = 42 / Fref;
+        const lD = clamp(FD * kF, -95, 95), y0D = mY + (lD > 0 ? -bs / 2 : bs / 2);
+        if (arrow(ctx, cx - bs * 0.22, y0D, 0, -lD, C.cF, 3)) sym(ctx, cx - bs * 0.22 - 24, y0D - lD * 0.6, 'F', 'D', C.cF);
+        const lG = clamp(FG * kF, 0, 95);
+        if (FG && arrow(ctx, cx + bs * 0.22, mY + bs / 2, 0, lG, C.ffield, 3)) sym(ctx, cx + bs * 0.22 + 6, mY + bs / 2 + lG * 0.6, 'F', 'G', C.ffield);
+        const lW = clamp(FW * kF, -80, 80);
+        if (S.delta > 0 && arrow(ctx, xr, mY, 0, -lW, C.heat, 3)) sym(ctx, xr + 7, mY - lW * 0.6, 'F', 'W', C.heat);
+      }
+      if (S.show.V) { const lv = clamp(S.v / vref * 40, -80, 80); if (arrow(ctx, xr, mY, 0, -lv, C.cv, 3)) sym(ctx, xr + 7, mY - lv * 0.6, 'v', '', C.cv); }
+      if (pen) {   // a rigid arm with a pen: the mass writes on the paper
+        ctx.strokeStyle = C.mark; ctx.lineWidth = 1.2; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(cx + bs / 2, mY); ctx.lineTo(gx0, mY); ctx.stroke();
+        ctx.fillStyle = C.mark; ctx.beginPath(); ctx.arc(gx0, mY, 2.5, 0, TAU); ctx.fill();
+      } else if (S.gs.x) {
+        ctx.setLineDash([2, 4]); ctx.strokeStyle = C.cx; ctx.lineWidth = 1.2;
+        ctx.beginPath(); ctx.moveTo(cx + bs / 2 + 4, mY); ctx.lineTo(X(S.t), mY); ctx.stroke(); ctx.setLineDash([]);
+      }
+
+      /* ---- graph: any combination of x, v, a (each on its own scale) and E ---- */
+      const QS = ['x', 'v', 'a'].filter(k => S.gs[k]);
+      const spec = {
+        x: { max: S.A0, fac: 100, dec: 1, unit: 'cm', lab: 'x', idx: 1 },
+        v: { max: S.A0 * w_, fac: 1, dec: 2, unit: 'm/s', lab: 'v', idx: 2 },
+        a: { max: S.A0 * w_ * w_, fac: 1, dec: 1, unit: 'm/s²', lab: 'a', idx: 3 },
+      };
+      const Yq = (k, v) => yMid - v / spec[k].max * half;
+      const eTop = gy0 + 8, Ye = e => gy1 - e / S.E0 * (gy1 - eTop);
+      const eFac = S.E0 < 0.5 ? 1000 : 1, eUnit = eFac === 1000 ? 'mJ' : 'J', eDec = S.E0 * eFac < 10 ? 1 : 0;
+
+      ctx.strokeStyle = C.grid2; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(gx0, gy0 - 6); ctx.lineTo(gx0, gy1); ctx.lineTo(gx1, gy1); ctx.stroke();
+      timeTicks(ctx, X, tw0, tw1, (gx1 - gx0) / W, gx0, gx1, gy0, gy1);
+      if (QS.length) {
+        ctx.strokeStyle = C.mark; ctx.beginPath(); ctx.moveTo(gx0, yMid); ctx.lineTo(gx1, yMid); ctx.stroke();
+        for (const s of [1, -1]) { ctx.strokeStyle = C.grid; ctx.beginPath(); ctx.moveTo(gx0, yMid - s * half); ctx.lineTo(gx1, yMid - s * half); ctx.stroke(); }
+        ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillStyle = C.muted; ctx.font = `12px ${BODY}`; ctx.fillText('0', gx0 - 6, yMid);
+        QS.forEach((k, i) => {
+          const sp = spec[k], dy = (i - (QS.length - 1) / 2) * 13;
+          for (const s of [1, -1]) text(ctx, fmt(s * sp.max * sp.fac, sp.dec), gx0 - 5, yMid - s * half + dy, C[QCOL[k]], `12px ${BODY}`, 'right');
+        });
+        let tx = gx1;
+        for (const k of [...QS].reverse()) {
+          const s = `${spec[k].lab} / ${spec[k].unit}`;
+          ctx.font = `italic 14px ${MATH}`; const tw = ctx.measureText(s).width;
+          text(ctx, s, tx, gy0 - 4, C[QCOL[k]], `italic 14px ${MATH}`, 'right', 'bottom'); tx -= tw + 14;
+        }
+      }
+      if (S.gs.E) {
+        const ex = onlyE ? gx0 - 6 : gx1 + 6, al = onlyE ? 'right' : 'left';
+        ctx.fillStyle = C.muted; ctx.font = `12px ${BODY}`; ctx.textAlign = al; ctx.textBaseline = 'middle';
+        ctx.fillText(fmt(S.E0 * eFac, eDec), ex, eTop); ctx.fillText('0', ex, gy1 - 2);
+        text(ctx, `E / ${eUnit}`, onlyE ? gx1 : gx1 + 6, onlyE ? gy0 - 4 : (eTop + gy1) / 2, C.ink, `italic 13px ${MATH}`, onlyE ? 'right' : 'left', onlyE ? 'bottom' : 'middle');
+        if (onlyE) { ctx.strokeStyle = C.grid; ctx.beginPath(); ctx.moveTo(gx0, eTop); ctx.lineTo(gx1, eTop); ctx.stroke(); }
+      }
+
+      ctx.save(); ctx.beginPath(); ctx.rect(gx0 + 1, 0, gx1 - gx0, h); ctx.clip();
+      const H = S.hist;
+      const line = (fy, col, lw, dash = []) => {
+        ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.setLineDash(dash); ctx.lineJoin = 'round'; ctx.beginPath();
+        let st = false;
+        for (const r of H) { if (r[0] < tw0 - 0.05) continue; const x = X(r[0]), y = fy(r); if (!st) { ctx.moveTo(x, y); st = true; } else ctx.lineTo(x, y); }
+        ctx.stroke(); ctx.setLineDash([]);
+      };
+      const curve = (f, col, lw, dash = [], alpha = 1) => {
+        ctx.strokeStyle = col; ctx.globalAlpha = alpha; ctx.lineWidth = lw; ctx.setLineDash(dash); ctx.beginPath();
+        for (let i = 0; i <= 260; i++) { const t = tw0 + (tEndCurve - tw0) * i / 260, x = X(t), y = Yq('x', f(t)); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+        ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
+      };
+      if (S.gs.E) {
+        const lw = onlyE ? 2.6 : 1.8;
+        if (S.delta > 0) line(r => Ye(S.E0 - r[4] - r[5]), C.heat, lw);
+        line(r => Ye(r[4] + r[5]), C.ink, lw, onlyE ? [] : [6, 4]);
+        line(r => Ye(r[5]), C.epot, lw);
+        line(r => Ye(r[4]), C.ekin, lw);
+        const e = energies(S.y, S.v);
+        const pts = [[e.k + e.p, C.ink], [e.p, C.epot], [e.k, C.ekin]];
+        if (S.delta > 0) pts.push([S.E0 - e.k - e.p, C.heat]);
+        for (const [v, c] of pts) { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(X(S.t), Ye(v), 3.5, 0, TAU); ctx.fill(); }
+      }
+      if (S.gs.x && S.show.cmp) for (const c of CMP) curve(t => formula(t, c.z * w_), C[c.col], 2.2, [], 0.95);
+      if (S.gs.x && S.show.env && kind() === 1) {
+        const wd = wdN(), R = Math.hypot(S.y0, (S.vv0 + S.delta * S.y0) / wd);
+        for (const s of [1, -1]) curve(t => s * R * Math.exp(-S.delta * t), C.cx, 1.5, [2, 4], 0.75);
+      }
+      if (S.gs.x && S.show.sol) curve(t => formula(t), C.ink, 1.6, [5, 5], 0.55);
+      const curNow = { x: S.y, v: S.v, a: acc(S.y, S.v) };
+      for (const k of QS) {
+        line(r => Yq(k, r[spec[k].idx]), C[QCOL[k]], 3);
+        ctx.fillStyle = C[QCOL[k]]; ctx.beginPath(); ctx.arc(X(S.t), Yq(k, curNow[k]), 4.5, 0, TAU); ctx.fill();
+      }
+      ctx.restore();
+
+      // legend in the band above the graph, when there is room
+      const items = S.gs.x && S.show.cmp ? CMP.map(c => [c.lab, C[c.col]])
+        : S.gs.E ? [['kinetisch', C.ekin], ['potentiell', C.epot], ['mechanisch', C.ink]].concat(S.delta > 0 ? [['Wärme', C.heat]] : []) : [];
+      if (items.length) {
+        ctx.font = `12px ${BODY}`;
+        const need = items.reduce((s, [l]) => s + ctx.measureText(l).width + 34, 0);
+        let lx = aw + 6 + gsel.offsetWidth + 14;
+        if (lx + need < w - 56) {
+          for (const [s, c] of items) {
+            ctx.fillStyle = c; ctx.fillRect(lx, 28.5, 14, 3);
+            text(ctx, s, lx + 18, 30, C.muted, `12px ${BODY}`, 'left'); lx += ctx.measureText(s).width + 34;
+          }
+        }
+      }
+    }
+
+    /* ---------- graph selector on the canvas ---------- */
+    function buildGsel() {
+      const items = [['x', 'x', 'Auslenkung x(t)'], ['v', 'v', 'Geschwindigkeit v(t)'], ['a', 'a', 'Beschleunigung a(t)'], ['E', '<span class="e">E</span>', 'Energie']];
+      gsel.innerHTML = items.map(([k, lab, t]) => `<button type="button" role="checkbox" data-g="${k}" aria-checked="${!!S.gs[k]}" title="${t}" aria-label="${t}">${lab}</button>`).join('');
+    }
+    gsel.addEventListener('click', e => {
+      const b = e.target.closest('[data-g]'); if (!b) return;
+      const k = b.dataset.g;
+      if (S.gs[k] && Object.values(S.gs).filter(Boolean).length === 1) return;   // at least one stays on
+      S.gs[k] = !S.gs[k];
+      b.setAttribute('aria-checked', String(S.gs[k]));
+      S.dirty = true; ui(true);
+    });
+
+    /* ---------- panel ---------- */
+    let lastKey = '';
+    function ui(force) {
+      const w = w0(), e = energies(S.y, S.v), a = acc(S.y, S.v), k = kind();
+      const eF = S.E0 < 0.5 ? 1000 : 1, eU = eF === 1000 ? 'mJ' : 'J', eD = S.E0 * eF < 10 ? 2 : 1;
+      const wd = wdN(), Td = k <= 1 ? TAU / wd : NaN;
+      const ratioTh = k === 0 ? 1 : k === 1 ? Math.exp(S.delta * Td) : NaN;
+      const mx = S.maxima, ratioMeas = k <= 1 && mx.length >= 2 && mx[mx.length - 1][1] > 2e-3 * S.A0 ? mx[mx.length - 2][1] / mx[mx.length - 1][1] : NaN;
+      const rows = [
+        ['Zeit <span class="m">t</span>', 's', fmt(S.t, 2)],
+        ['<span class="t-cx">Auslenkung</span> <span class="m">x</span>', 'cm', fmt(S.y * 100, 1)],
+        ['<span class="t-cv">Geschwindigkeit</span> <span class="m">v</span>', 'm/s', fmt(S.v, 2)],
+        ['<span class="t-ca">Beschleunigung</span> <span class="m">a</span>', 'm/s²', fmt(a, 2)],
+        ['<span class="t-cF">Federkraft</span> <span class="m">F<sub>D</sub></span> (+ = nach oben)', 'N', fmt(S.p.D * (shift() - S.y), 2)],
+        ['<span class="t-q">Reibungskraft</span> <span class="m">F<sub>W</sub> = −b v</span>', 'N', fmt(-bco() * S.v, 2)],
+        ['<span class="t-ek">Kinetische Energie</span>', eU, fmt(e.k * eF, eD)],
+        ['<span class="t-ep">Potentielle Energie</span> <span class="m">½ D x²</span>', eU, fmt(e.p * eF, eD)],
+        ['Mechanische Energie', eU, fmt((e.k + e.p) * eF, eD)],
+        ['<span class="t-q">In Wärme umgewandelt</span>', eU, fmt(Math.max(0, S.E0 - e.k - e.p) * eF, eD)],
+        ['Eigenfrequenz <span class="m">ω<sub>0</sub> = √(D/m)</span>', '1/s', fmt(w, 2)],
+        ['Abklingkonstante <span class="m">δ</span>', '1/s', fmt(S.delta, 2)],
+        ['Reibungskoeffizient <span class="m">b = 2 m δ</span>', 'kg/s', fmt(bco(), 2)],
+        ['<span class="m">ω<sub>d</sub> = √(ω<sub>0</sub>² − δ²)</span>', '1/s', k <= 1 ? fmt(wd, 2) : '—'],
+        ['Periode <span class="m">T<sub>d</sub> = 2π/ω<sub>d</sub></span>', 's', k <= 1 ? fmt(Td, 3) : '—'],
+        ['Periode gemessen', 's', k <= 1 && S.Tm ? fmt(S.Tm, 3) : '—'],
+        ['Verhältnis zweier Maxima <span class="m">e<sup>δT<sub>d</sub></sup></span>', '', k <= 1 ? fmt(ratioTh, 3) : '—'],
+        ['Verhältnis gemessen', '', fmt(ratioMeas, 3)],
+      ];
+      setHTML($('#d-num'), tableRows(rows));
+
+      if (force) {
+        $('#d-mOut').textContent = fmt(S.p.m, 2) + ' kg'; $('#d-DOut').textContent = fmt(S.p.D) + ' N/m';
+        $('#d-x0Out').textContent = fmt(S.p.x0 * 100) + ' cm'; $('#d-v0Out').textContent = fmt(S.p.v0, 2) + ' m/s';
+        const names = ['ungedämpft', 'Schwingfall', 'Grenzfall', 'Kriechfall'];
+        $('#d-zOut').textContent = S.zeta === 0 ? 'keine' : `${fmt(S.zeta, 2)}, δ = ${fmt(S.delta, 2)} 1/s (${names[k]})`;
+        $$('[data-dz]').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.dz === S.zeta)));
+        $('#d-zNote').innerHTML = [
+          '<b>Ungedämpft</b> (<span class="m">δ = 0</span>): Die Schwingung läuft ewig mit gleicher Amplitude. Es gibt keine Flüssigkeit, die bremst.',
+          `<b>Schwingfall</b> (<span class="m">δ² &lt; ω<sub>0</sub>²</span>, geringe Dämpfung): Die Amplitude nimmt exponentiell ab, <span class="m">x(t) = A e<sup>−δt</sup> cos(ω t + φ<sub>0</sub>)</span> mit <span class="m">ω = √(ω<sub>0</sub>² − δ²)</span> = ${fmt(wd, 2)} 1/s.`,
+          '<b>Aperiodischer Grenzfall</b> (<span class="m">δ² = ω<sub>0</sub>²</span>, „optimale Dämpfung“): schnellstmögliche Rückkehr zur Ruhelage, ohne Überschwingen. <span class="m">x(t) = (A + B t) e<sup>−δt</sup></span>.',
+          '<b>Kriechfall</b> (<span class="m">δ² &gt; ω<sub>0</sub>²</span>, starke Dämpfung): langsame Rückkehr zur Ruhelage, ohne zu schwingen. Je stärker die Dämpfung, desto langsamer.',
+        ][k];
+        $('#d-cmpLegend').hidden = !S.show.cmp;
+        $('#d-showNote').innerHTML = (S.show.pen ? '<b>Masse schreibt:</b> Ein Stift an der Masse zeichnet die Kurve auf das Papier. Die neueste Stelle ist links beim Stift, das Papier läuft nach rechts weg. ' : '') +
+          'Gestrichelt: die Lösung der Bewegungsgleichung als Formel, sie liegt genau auf der simulierten Kurve. Punktiert: die Einhüllende <span class="m">±A e<sup>−δt</sup></span>, an der die Maxima entlanglaufen (nur im Schwingfall). Mit den Knöpfen x, v, a und E über dem Graphen kannst du mehrere Grössen gleichzeitig einblenden. Bei E siehst du auch, wie viel Energie schon in Wärme umgewandelt ist.';
+        writeEq(); writeDgl();
+      }
+      explain();
+    }
+
+    function explain() {
+      const w = w0(), k = kind(), a = acc(S.y, S.v);
+      let pill, st = '', title, txt;
+      if (S.run) {
+        pill = 'Läuft'; st = 'on';
+        if (k === 0) {
+          title = 'Ungedämpft: Die Schwingung hört nie auf';
+          txt = `Ohne Reibung bleibt die Energie erhalten. Die Masse schwingt mit <span class="m">ω<sub>0</sub> = √(D/m)</span> = ${fmt(w, 2)} 1/s ewig weiter. Stelle unten eine Dämpfung ein.`;
+        } else if (k === 1) {
+          title = 'Schwingfall: Die Amplitude nimmt exponentiell ab';
+          txt = `Die Flüssigkeit bremst mit der Reibungskraft <span class="m">F<sub>W</sub> = −b v</span>, mit <span class="m">b = 2mδ</span> = ${fmt(bco(), 2)} kg/s. Die Masse schwingt weiter, aber die Amplitude fällt mit <span class="m">e<sup>−δt</sup></span>: alle <span class="m">ln 2 / δ</span> = ${fmt(Math.LN2 / S.delta, 2)} s auf die Hälfte. Die Periode <span class="m">T<sub>d</sub></span> = ${fmt(TAU / wdN(), 2)} s bleibt dabei gleich.`;
+        } else if (k === 2) {
+          title = 'Aperiodischer Grenzfall: schnellstmögliche Rückkehr';
+          txt = `Hier ist <span class="m">δ = ω<sub>0</sub></span> = ${fmt(w, 2)} 1/s. Die Masse kehrt ohne Überschwingen zur Ruhelage zurück, schneller als bei jeder anderen Dämpfung. So stellt man Stossdämpfer und Messinstrumente ein.`;
+        } else {
+          title = 'Kriechfall: langsame Rückkehr';
+          txt = `Hier ist <span class="m">δ</span> = ${fmt(S.zeta, 2)} <span class="m">ω<sub>0</sub></span>. Die Reibung ist so stark, dass die Masse nicht mehr schwingt. Sie kriecht zur Ruhelage zurück, umso langsamer, je stärker die Dämpfung ist. Vergleiche mit dem Grenzfall.`;
+        }
+        txt += ' Pausiere, um einen Zeitpunkt genau anzuschauen.';
+      } else {
+        pill = 'Pause'; st = 'end';
+        const e = energies(S.y, S.v), Em = e.k + e.p, ek = Em > 1e-12 ? e.k / Em : 0, lost = clamp(1 - Em / S.E0, 0, 1);
+        const amp = Math.hypot(S.y, S.v / w), turn = Math.abs(S.v) < 0.1 * amp * w, rest = Math.abs(S.y) < 0.1 * amp;
+        const out = S.y * S.v > 0;
+        title = amp < 0.003 * S.A0 ? 'Die Bewegung ist abgeklungen' : turn ? `Umkehrpunkt ${S.y > 0 ? 'oben' : 'unten'}` : rest ? 'Durch die Ruhelage' : out ? `Weg von der Ruhelage, nach ${S.y > 0 ? 'oben' : 'unten'}` : 'Zurück zur Ruhelage';
+        const FD = S.p.D * (shift() - S.y), FW = -bco() * S.v;
+        txt = `<span class="m">x</span> = ${fmt(S.y * 100, 1)} cm, <span class="m">v</span> = ${fmt(S.v, 2)} m/s, <span class="m">a</span> = ${fmt(a, 2)} m/s². Federkraft <span class="m">F<sub>D</sub></span> = ${fmt(FD, 2)} N.` +
+          (S.delta > 0 ? ` Reibungskraft <span class="m">F<sub>W</sub></span> = ${fmt(FW, 2)} N, sie zeigt immer gegen die Geschwindigkeit.` : '') +
+          (amp < 0.003 * S.A0 ? '' : turn ? ' Am Umkehrpunkt ist die Geschwindigkeit null, also auch die Reibungskraft.' : rest ? ' In der Ruhelage ist die Geschwindigkeit am grössten, also auch die Reibungskraft.' : '') +
+          ` Energie: ${fmt(ek * 100)} % der mechanischen Energie ist kinetisch, ${fmt((1 - ek) * 100)} % potentiell.` +
+          (S.delta > 0 ? ` Von der Startenergie sind schon ${fmt(lost * 100)} % in Wärme umgewandelt.` : '');
+      }
+      const key = pill + title + txt;
+      if (key === lastKey) return;
+      lastKey = key;
+      const pe = $('#d-pill'); pe.textContent = pill; pe.dataset.state = st;
+      $('#d-eTitle').textContent = title; $('#d-eText').innerHTML = txt;
+    }
+
+    function writeEq() {
+      const w = w0(), k = kind(), d = S.delta;
+      const card = (on, name, cond, f, sub, desc) => `<div class="case${on ? ' on' : ''}"><h4>${name}${on ? '<span class="tag">eingestellt</span>' : ''}</h4>${eqs(...f)}<p>${cond} ${desc}</p></div>`;
+      let h = eqs(['m ' + D2('x') + ' = −D x − b ' + D1('x'), 'Newton: Federkraft F<sub>D</sub> ~ −x, Reibung F<sub>W</sub> ~ −ẋ']) +
+        eqs([D2('x') + ' + 2δ ' + D1('x') + ' + ω<sub>0</sub>² x = 0', 'Bewegungsgleichung der gedämpften Schwingung'], ['δ = b / 2m', 'Stärke der Dämpfung']) +
+        `<p class="optnote">Mit den Einstellungen: <span class="m">ω<sub>0</sub></span> = ${fmt(w, 2)} 1/s, <span class="m">δ</span> = ${fmt(d, 2)} 1/s, <span class="m">b</span> = ${fmt(bco(), 2)} kg/s.</p>` +
+        '<div class="cases">' +
+        card(k === 1 || k === 0, 'Schwingfall', '<span class="m">δ² &lt; ω<sub>0</sub>²</span>, geringe Dämpfung.', [['x(t) = A e<sup>−δt</sup> cos(ω t + φ<sub>0</sub>)', ''], ['ω = √(ω<sub>0</sub>² − δ²)', '']], '', 'Die Amplitude nimmt exponentiell ab, die Masse schwingt weiter.') +
+        card(k === 2, 'Aperiodischer Grenzfall', '<span class="m">δ² = ω<sub>0</sub>²</span>, „optimale Dämpfung“.', [['x(t) = (A + B t) e<sup>−δt</sup>', '']], '', 'Schnellstmögliche Rückkehr zum Ruhezustand.') +
+        card(k === 3, 'Kriechfall', '<span class="m">δ² &gt; ω<sub>0</sub>²</span>, starke Dämpfung.', [['x(t) = A e<sup>−(δ−κ)t</sup> + B e<sup>−(δ+κ)t</sup>', ''], ['κ = √(δ² − ω<sub>0</sub>²)', '']], '', 'Langsame Rückkehr zum Ruhezustand.') +
+        '</div>' +
+        eqs(['E(t) ≈ E<sub>0</sub> e<sup>−2δt</sup>', 'Energie im Schwingfall: halbiert sich doppelt so schnell wie die Amplitude']) +
+        '<p class="note">Die Konstanten <span class="m">A</span>, <span class="m">B</span> und <span class="m">φ<sub>0</sub></span> kommen aus den Anfangsbedingungen <span class="m">x(0)</span> und <span class="m">v(0)</span>. Wie man die drei Lösungen findet, steht unter „DGL lösen“.</p>';
+      setHTML($('#d-eq'), h);
+    }
+
+    function writeDgl() {
+      const w = w0(), d = S.delta, x0 = S.y0, v0 = S.vv0, k = kind();
+      let cst;
+      if (k <= 1) {
+        const wd = wdN(), B = (v0 + d * x0) / wd;
+        cst = `<span class="m">x(t) = e<sup>−δt</sup> (A cos ω<sub>d</sub>t + B sin ω<sub>d</sub>t)</span> mit <span class="m">A = x(0)</span> = ${fmt(x0 * 100, 1)} cm und <span class="m">B = (v(0) + δ x(0)) / ω<sub>d</sub></span> = ${fmt(B * 100, 1)} cm.`;
+      } else if (k === 2) {
+        cst = `<span class="m">x(t) = (A + B t) e<sup>−δt</sup></span> mit <span class="m">A = x(0)</span> = ${fmt(x0 * 100, 1)} cm und <span class="m">B = v(0) + δ x(0)</span> = ${fmt((v0 + d * x0) * 100, 1)} cm/s.`;
+      } else {
+        const s = Math.sqrt(d * d - w * w), l1 = -d + s, l2 = -d - s, C1 = (v0 - l2 * x0) / (l1 - l2), C2 = x0 - C1;
+        cst = `<span class="m">x(t) = C<sub>1</sub> e<sup>λ<sub>1</sub>t</sup> + C<sub>2</sub> e<sup>λ<sub>2</sub>t</sup></span> mit <span class="m">λ<sub>1</sub></span> = ${fmt(l1, 2)} 1/s, <span class="m">λ<sub>2</sub></span> = ${fmt(l2, 2)} 1/s, <span class="m">C<sub>1</sub></span> = ${fmt(C1 * 100, 1)} cm, <span class="m">C<sub>2</sub></span> = ${fmt(C2 * 100, 1)} cm. Aus <span class="m">x(0) = C<sub>1</sub> + C<sub>2</sub></span> und <span class="m">v(0) = λ<sub>1</sub>C<sub>1</sub> + λ<sub>2</sub>C<sub>2</sub></span>.`;
+      }
+      const rate = k === 0 ? 0 : k === 1 ? d : k === 2 ? w : d - Math.sqrt(d * d - w * w);
+      const sub = (on, head, body) => `<div class="case${on ? ' on' : ''}"><h4>${head}${on ? '<span class="tag">eingestellt</span>' : ''}</h4><p>${body}</p></div>`;
+      const h = `<section class="group" style="border-top:0;padding-top:0" aria-labelledby="d-h-d1"><h3 id="d-h-d1">Die gedämpfte Schwingung lösen</h3>` +
+        stepBox(1, `<p><b>Kräfte aufschreiben.</b> Die Feder zieht zur Ruhelage, <span class="m">F<sub>D</sub> = −D x</span>. Die Flüssigkeit bremst proportional zur Geschwindigkeit, <span class="m">F<sub>W</sub> = −b ${D1('x')}</span>. Newton II:</p>${eqn('m ' + D2('x') + ' = −D x − b ' + D1('x'))}<p>Durch <span class="m">m</span> teilen und <span class="m">2δ = b/m</span>, <span class="m">ω<sub>0</sub>² = D/m</span> einsetzen:</p>${eqn(D2('x') + ' + 2δ ' + D1('x') + ' + ω<sub>0</sub>² x = 0')}`) +
+        stepBox(2, `<p><b>Exponentialansatz.</b> Probiere <span class="m">x(t) = e<sup>λt</sup></span>. Jede Ableitung gibt einen Faktor <span class="m">λ</span>: <span class="m">${D1('x')} = λ e<sup>λt</sup></span>, <span class="m">${D2('x')} = λ² e<sup>λt</sup></span>. Einsetzen und durch <span class="m">e<sup>λt</sup></span> kürzen:</p>${eqn('λ² + 2δ λ + ω<sub>0</sub>² = 0')}${eqn('λ = −δ ± √(δ² − ω<sub>0</sub>²)', 'Mitternachtsformel')}`) +
+        stepBox(3, `<p><b>Die Wurzel entscheidet.</b> Je nach Vorzeichen von <span class="m">δ² − ω<sub>0</sub>²</span> gibt es drei Fälle:</p><div class="cases">` +
+          sub(k <= 1, 'Schwingfall, δ &lt; ω<sub>0</sub>', `Die Wurzel ist imaginär: <span class="m">λ = −δ ± iω<sub>d</sub></span> mit <span class="m">ω<sub>d</sub> = √(ω<sub>0</sub>² − δ²)</span>. Mit <span class="m">e<sup>iθ</sup> = cos θ + i sin θ</span> wird daraus eine abklingende Schwingung: <span class="m">x(t) = A e<sup>−δt</sup> cos(ω<sub>d</sub> t + φ<sub>0</sub>)</span>.`) +
+          sub(k === 2, 'Grenzfall, δ = ω<sub>0</sub>', 'Die Wurzel ist null, es gibt nur <span class="m">λ = −δ</span>. Die zweite Lösung ist <span class="m">t e<sup>−δt</sup></span> (einsetzen und nachprüfen). Also <span class="m">x(t) = (A + B t) e<sup>−δt</sup></span>.') +
+          sub(k === 3, 'Kriechfall, δ &gt; ω<sub>0</sub>', 'Zwei reelle, negative Werte <span class="m">λ<sub>1,2</sub> = −δ ± κ</span> mit <span class="m">κ = √(δ² − ω<sub>0</sub>²)</span>. Die Lösung ist eine Summe von zwei abfallenden Exponentialfunktionen, sie schwingt nicht.') +
+          '</div>') +
+        stepBox(4, `<p><b>Anfangsbedingungen einsetzen.</b> Mit <span class="m">x(0)</span> = ${fmt(x0 * 100, 1)} cm und <span class="m">v(0)</span> = ${fmt(v0, 2)} m/s:</p><p class="optnote">${cst}</p>`) +
+        stepBox(5, `<p><b>Warum ist der Grenzfall am schnellsten?</b> Nach einiger Zeit zählt nur noch der am langsamsten abfallende Teil. Im Schwingfall fällt er mit <span class="m">e<sup>−δt</sup></span> und <span class="m">δ &lt; ω<sub>0</sub></span>. Im Kriechfall fällt der langsamere Teil mit <span class="m">e<sup>−(δ−κ)t</sup></span>, und <span class="m">δ − κ</span> ist kleiner als <span class="m">ω<sub>0</sub></span>. Nur im Grenzfall erreicht die Abklingrate den grössten möglichen Wert <span class="m">ω<sub>0</sub></span>.</p><p class="optnote">Mit den Einstellungen klingt die Bewegung mit der Rate ${fmt(rate, 2)} 1/s ab, der Grenzfall hätte ${fmt(w, 2)} 1/s.</p>`) +
+        stepBox(6, `<p><b>Wohin geht die Energie?</b> Ableiten der mechanischen Energie und Einsetzen der Bewegungsgleichung gibt</p>${eqn('dE/dt = d/dt (½ m v² + ½ D x²) = v (m ' + D2('x') + ' + D x) = −b v²')}<p>Die Energie nimmt ab, sobald sich die Masse bewegt. Sie wird in der Flüssigkeit zu Wärme. Im Schwingfall gilt ungefähr <span class="m">E ~ e<sup>−2δt</sup></span>, weil <span class="m">E ~ A²</span>.</p>`) +
+        '</section>';
+      setHTML($('#d-dglBox'), h);
+    }
+
+    function writeTry() {
+      const T = [
+        ['Folie, Frage a): Bei einem Pendel mit geringer Dämpfung wird die Schwingungsdauer immer länger, bis es stehen bleibt. Stimmt das?', 'Nein. Stelle den Schwingfall ein und schau in der Tabelle auf „Periode gemessen“: Sie bleibt von Schwingung zu Schwingung gleich, nämlich <span class="m">T<sub>d</sub> = 2π/ω<sub>d</sub></span>. Nur die Amplitude wird kleiner. Nicht die Frequenz wird kleiner, sondern die Amplitude.'],
+        ['Welcher Fall kehrt am schnellsten zur Ruhelage zurück?', 'Schalte „Alle drei Fälle im Graphen vergleichen“ ein. Der aperiodische Grenzfall (orange) ist zuerst nahe null und schwingt nicht über. Der Schwingfall schwingt noch lange, der Kriechfall braucht viel länger. Die Begründung steht unter „DGL lösen“, Schritt 5.'],
+        ['Stelle <span class="m">δ</span> = 0.1 <span class="m">ω<sub>0</sub></span> ein. Wie gross ist das Verhältnis zweier aufeinanderfolgender Maxima?', 'Immer gleich, nämlich <span class="m">e<sup>δT<sub>d</sub></sup></span> ≈ 1.88. Das ist das Kennzeichen einer exponentiellen Abnahme: In gleichen Zeiten nimmt die Amplitude um denselben Faktor ab. Vergleiche Theorie und Messung in der Tabelle.'],
+        ['Wohin geht die Energie?', 'Blende im Graphen E ein. Die mechanische Energie (gestrichelt) nimmt ab, die Wärme (pink) nimmt zu. Die Summe bleibt die Startenergie. Am meisten Energie geht verloren, wenn die Masse schnell ist, also beim Durchgang durch die Ruhelage: <span class="m">dE/dt = −b v²</span>.'],
+        ['Wie sollte man einen Stossdämpfer im Auto einstellen?', 'Nahe am Grenzfall. Zu schwach gedämpft schaukelt das Auto nach jeder Bodenwelle nach. Zu stark gedämpft (Kriechfall) federt es langsam aus und ist beim nächsten Schlag noch zusammengedrückt.'],
+        ['Mach im Kriechfall die Dämpfung noch stärker. Wird die Rückkehr schneller?', 'Nein, langsamer. Die Flüssigkeit bremst so stark, dass die Feder die Masse kaum noch zurückziehen kann. Mit <span class="m">δ</span> = 2.5 <span class="m">ω<sub>0</sub></span> ist die Masse nach mehreren Perioden noch nicht zurück.'],
+        ['Starte mit <span class="m">x(0) = 0</span> und <span class="m">v(0)</span> = 1 m/s im Grenzfall. Was passiert?', 'Die Masse schiesst einmal hinaus, kehrt um und kriecht dann ohne Überschwingen zurück. „Kein Überschwingen“ heisst: Sie geht höchstens einmal durch die Ruhelage. Vergleiche mit dem Schwingfall.'],
+        ['Schalte die Schwerkraft aus und ein. Ändert sich etwas an der Dämpfung?', 'Nein. Die Schwerkraft verschiebt nur die Ruhelage nach unten. Die Bewegungsgleichung um die neue Ruhelage ist dieselbe, also auch <span class="m">ω<sub>0</sub></span>, <span class="m">δ</span> und der Fall der Dämpfung.'],
+      ];
+      $('#d-try').innerHTML = detailsList(T);
+      $('#d-foot').innerHTML = 'Die Feder ist masselos, die Masse ein Punkt. <span class="m">x</span> ist von der Ruhelage aus gemessen, nach oben positiv. Die Reibung ist proportional zur Geschwindigkeit, <span class="m">F<sub>W</sub> = −b v</span>. Pfeile: Federkraft (orange), Gewichtskraft (rot), Reibungskraft (pink) und Geschwindigkeit (türkis). Die Animation ist nicht massstäblich: Die Auslenkung ist so vergrössert, dass sie die Höhe des Graphen füllt. Gerechnet wird mit dem Runge-Kutta-Verfahren in Schritten von 0.5 ms.';
+    }
+
+    /* ---------- inputs ---------- */
+    const bindP = (id, key) => $('#' + id).addEventListener('input', e => { S.p[key] = +e.target.value; reset(); });
+    bindP('d-m', 'm'); bindP('d-D', 'D'); bindP('d-x0', 'x0'); bindP('d-v0', 'v0');
+    $('#d-grav').addEventListener('change', e => { S.p.grav = e.target.checked; reset(); });
+    $('#d-z').addEventListener('input', e => { S.zeta = +e.target.value; reset(); });
+    $$('[data-dz]').forEach(b => b.addEventListener('click', () => { S.zeta = +b.dataset.dz; $('#d-z').value = S.zeta; reset(); }));
+    $$('input[name="d-tempo"]').forEach(r => r.addEventListener('change', () => { S.tempo = +r.value; }));
+    [['d-pen', 'pen'], ['d-sol', 'sol'], ['d-env', 'env'], ['d-cmp', 'cmp'], ['d-F', 'F'], ['d-V', 'V']].forEach(([id, k]) =>
+      $('#' + id).addEventListener('change', e => { S.show[k] = e.target.checked; S.dirty = true; ui(true); }));
+    $('#d-defaults').addEventListener('click', () => {
+      S.p = { m: DEF.m, D: DEF.D, x0: DEF.x0, v0: DEF.v0, grav: DEF.grav }; S.zeta = DEF.zeta;
+      for (const [id, v] of [['d-m', DEF.m], ['d-D', DEF.D], ['d-x0', DEF.x0], ['d-v0', DEF.v0], ['d-z', DEF.zeta]]) $('#' + id).value = v;
+      $('#d-grav').checked = true;
+      reset();
+    });
+
+    buildGsel(); writeTry();
+    return { S, draw, step, ui, reset, init: reset };
+  })();
+
+  /* =====================================================================
+     Seite 2: erzwungene Schwingung. Der Aufhängepunkt wird mit s(t) = s0 cos(Ωt) bewegt.
+     ẍ + 2δẋ + ω0² x = ω0² s0 cos(Ωt), also A0 = ω0² s0.
+     ===================================================================== */
+  PG.f = (() => {
+    const cv = $('#f-cv'), gsel = $('#f-gsel');
+    const m = 0.5, Dk = 20, w0 = Math.sqrt(Dk / m), s0 = 0.01;
+    const WIN = 10, SWEEP_RATE = 0.03, SWEEP_END = 2.2;
+    const S = {
+      r: 0.5, zeta: 0.1, tempo: 1, run: true, dirty: true,
+      t: 0, x: 0, v: 0, th: 0, hist: [], lastHist: -1, tChange: 0, tDrv: 0, phMeas: null,
+      meas: [], trace: { z: 0.1, pts: [] }, sweep: false, steady: false,
+      gs: { A: true, phi: true }, show: { sol: true, F: false, fam: false }, geo: null,
+    };
+    const Om = () => S.r * w0, del = () => S.zeta * w0;
+    const amp = (r, z = S.zeta) => s0 / Math.sqrt((1 - r * r) ** 2 + (2 * z * r) ** 2);
+    const phase = (r, z = S.zeta) => Math.atan2(2 * z * r, 1 - r * r);
+    const rRes = (z = S.zeta) => z < Math.SQRT1_2 ? Math.sqrt(1 - 2 * z * z) : 0;
+    const ampMax = (z = S.zeta) => z < Math.SQRT1_2 ? s0 / (2 * z * Math.sqrt(1 - z * z)) : s0;
+    const acc = (x, v, th) => -w0 * w0 * (x - s0 * Math.cos(th)) - 2 * del() * v;
+
+    // how far the motion still is from the steady solution, relative to its amplitude
+    function devi() {
+      const A = amp(S.r), ph = phase(S.r), O = Om();
+      const xs = A * Math.cos(S.th - ph), vs = -A * O * Math.sin(S.th - ph);
+      const wd = w0 * Math.sqrt(Math.max(0.05, 1 - S.zeta * S.zeta));
+      return Math.hypot(S.x - xs, (S.v - vs) / wd) / A;
+    }
+    // largest |x| during the last drive period
+    function curAmp() {
+      const T = TAU / Om();
+      if (S.t < T || !S.hist.length || S.hist[0][0] > S.t - T) return null;
+      let mx = 0;
+      for (let i = S.hist.length - 1; i >= 0; i--) { const r = S.hist[i]; if (r[0] < S.t - T) break; mx = Math.max(mx, Math.abs(r[1])); }
+      return mx;
+    }
+    function reset() {
+      S.t = 0; S.x = 0; S.v = 0; S.th = 0; S.hist = []; S.lastHist = -1; S.tChange = 0; S.tDrv = 0; S.phMeas = null;
+      if (S.sweep) { S.sweep = false; syncSweep(); }
+      S.trace = { z: S.zeta, pts: [] };
+      record(); S.dirty = true; ui(true);
+    }
+    function record() {
+      S.hist.push([S.t, S.x, s0 * Math.cos(S.th), S.th]);
+      while (S.hist.length && S.hist[0][0] < S.t - WIN - 1) S.hist.shift();
+    }
+    function step(dt) {
+      const n = Math.max(1, Math.ceil(dt / 0.0005)), h = dt / n;
+      for (let i = 0; i < n; i++) {
+        const O = Om(), x = S.x, v = S.v, th = S.th;
+        const k1x = v, k1v = acc(x, v, th);
+        const k2x = v + h / 2 * k1v, k2v = acc(x + h / 2 * k1x, k2x, th + O * h / 2);
+        const k3x = v + h / 2 * k2v, k3v = acc(x + h / 2 * k2x, k3x, th + O * h / 2);
+        const k4x = v + h * k3v, k4v = acc(x + h * k3x, k4x, th + O * h);
+        S.x = x + h / 6 * (k1x + 2 * k2x + 2 * k3x + k4x);
+        S.v = v + h / 6 * (k1v + 2 * k2v + 2 * k3v + k4v);
+        S.th = th + O * h;
+        // the drive is at its top when θ passes a multiple of 2π
+        const nNew = Math.floor(S.th / TAU);
+        if (nNew > Math.floor(th / TAU)) S.tDrv = S.t + h * (nNew * TAU - th) / (S.th - th);
+        // the mass is at its top: measure how far it lags behind the drive
+        if (v > 0 && S.v <= 0) {
+          const tp = S.t + h * v / (v - S.v);
+          let ph = ((tp - S.tDrv) * O) % TAU; if (ph > 1.5 * Math.PI) ph -= TAU;
+          S.phMeas = ph;
+          if (S.sweep) { const A = curAmp(); if (A != null) S.trace.pts.push([S.r, A]); }
+        }
+        S.t += h;
+        if (S.sweep) S.r = Math.min(SWEEP_END, S.r + SWEEP_RATE * h);
+      }
+      if (S.sweep) {
+        S.tChange = S.t; $('#f-r').value = S.r;
+        if (S.r >= SWEEP_END) { S.sweep = false; syncSweep(); }
+        sweepTick = true;
+      }
+      if (S.t - S.lastHist >= 0.008) { S.lastHist = S.t; record(); }
+      checkSteady();
+      S.dirty = true;
+    }
+    let sweepTick = false;
+    // once the transient has died out, the amplitude of the last period becomes a measured point
+    function checkSteady() {
+      S.steady = !S.sweep && S.t - S.tChange > TAU / Om() && devi() < 0.015;
+      if (!S.steady) return;
+      if (S.meas.some(p => Math.abs(p.r - S.r) < 1e-6 && Math.abs(p.z - S.zeta) < 1e-6)) return;
+      const A = curAmp(); if (A == null) return;
+      S.meas.push({ r: S.r, z: S.zeta, A, ph: S.phMeas });
+      S.meas.sort((a, b) => a.r - b.r);
+      measNote();
+    }
+
+    /* ---------- drawing ---------- */
+    function draw() {
+      const { ctx, w, h } = fit(cv);
+      ctx.clearRect(0, 0, w, h);
+      const narrow = w < 560;
+      const aw = Math.round(w * (narrow ? 0.29 : 0.26));
+      gsel.style.left = (aw + 6) + 'px';
+      const top0 = 56, phiOn = S.gs.phi;
+      const gx0 = aw + 44, gx1 = w - (phiOn ? 42 : 16);
+      const avail = h - top0 - 28;
+      const ry0 = top0 + 12, ry1 = top0 + Math.round(avail * 0.42);
+      const gy0 = ry1 + 46, gy1 = h - 28;
+      const yMid = (gy0 + gy1) / 2, half = 0.42 * (gy1 - gy0);
+      S.geo = { gx0, gx1, ry0, ry1 };
+
+      // one scale (cm) for the animation and the time graph; the wheel pin may not get too big
+      const rpMax = narrow ? 14 : 22;
+      const Ycm = niceCeil(Math.max(ampMax() * 100 * 1.05, s0 * 100 * half / rpMax));
+      const kx = half / (Ycm / 100);
+      const O = Om(), A = amp(S.r), ph = phase(S.r);
+
+      ctx.strokeStyle = C.grid2; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(aw, 12); ctx.lineTo(aw, h - 12); ctx.stroke();
+
+      /* ---- animation: wheel, yoke, spring, mass ---- */
+      const cx = Math.round(aw * 0.6), bs = clamp(aw * 0.19, 22, 38);
+      const rp = s0 * kx, Rw = Math.max(rp + 6, clamp(aw * 0.1, 12, 19));
+      const wx = Math.max(Rw + 6, cx - Rw - 16), wy = top0 + Rw + 10;
+      const sNow = s0 * Math.cos(S.th), yy = wy - rp * Math.cos(S.th);
+      const mY = clamp(yMid - S.x * kx, gy0 - 10, gy1 + 6);
+      drawTank(ctx, cx, yMid - half - bs / 2 - 12, Math.min(h - 6, yMid + half + bs / 2 + 8), Math.min(bs * 1.3, aw - cx - 4), S.zeta);
+      // wheel with its axle bracket
+      ctx.strokeStyle = C.mark; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(wx, wy); ctx.lineTo(wx, wy - Rw - 8); ctx.stroke();
+      ctx.fillStyle = C.mark; ctx.fillRect(wx - 11, wy - Rw - 11, 22, 4);
+      ctx.fillStyle = C.surface; ctx.strokeStyle = C.mark; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(wx, wy, Rw, 0, TAU); ctx.fill(); ctx.stroke();
+      ctx.strokeStyle = C.grid2; ctx.lineWidth = 1.5;
+      for (let i = 0; i < 3; i++) { const a = S.th + i * TAU / 3; ctx.beginPath(); ctx.moveTo(wx, wy); ctx.lineTo(wx + (Rw - 2) * Math.sin(a), wy - (Rw - 2) * Math.cos(a)); ctx.stroke(); }
+      // rotation arrow and label
+      ctx.strokeStyle = C.drv; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(wx, wy, Rw + 5, -Math.PI / 2 - 0.5, -0.35); ctx.stroke();
+      const ea = -0.35, ex = wx + (Rw + 5) * Math.cos(ea), ey = wy + (Rw + 5) * Math.sin(ea);
+      ctx.fillStyle = C.drv; ctx.beginPath(); ctx.moveTo(ex + 5 * Math.cos(ea + Math.PI / 2), ey + 5 * Math.sin(ea + Math.PI / 2));
+      ctx.lineTo(ex - 4 * Math.cos(ea), ey - 4 * Math.sin(ea)); ctx.lineTo(ex + 4 * Math.cos(ea), ey + 4 * Math.sin(ea)); ctx.closePath(); ctx.fill();
+      text(ctx, 'Antrieb', wx, wy + Rw + 12, C.muted, `11px ${BODY}`);
+      sym(ctx, wx - Rw - 4 < 10 ? wx + Rw + 8 : wx - Rw - 16, wy - Rw + 2, 'Ω', '', C.drv, 15);
+      // yoke: a bar that the pin moves up and down, the spring hangs from its end
+      ctx.strokeStyle = C.equi; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(cx + 13, wy - rp - 10); ctx.lineTo(cx + 13, wy + rp + 10); ctx.stroke();
+      ctx.fillStyle = C.drv; ctx.globalAlpha = 0.9;
+      ctx.fillRect(wx - rp - 6, yy - 3, cx + 13 - (wx - rp - 6), 6); ctx.globalAlpha = 1;
+      ctx.fillStyle = C.ink; ctx.beginPath(); ctx.arc(wx + rp * Math.sin(S.th), yy, 3.4, 0, TAU); ctx.fill();
+      ctx.fillStyle = C.ink; ctx.beginPath(); ctx.arc(wx, wy, 2.5, 0, TAU); ctx.fill();
+      drawSpring(ctx, cx, yy + 3, mY - bs / 2, clamp(aw * 0.075, 7, 12), 16);
+      ctx.setLineDash([3, 4]); ctx.strokeStyle = C.equi; ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.moveTo(6, yMid); ctx.lineTo(aw - 4, yMid); ctx.stroke(); ctx.setLineDash([]);
+      drawMass(ctx, cx, mY, bs);
+      if (S.show.F) {
+        const FD = Dk * (sNow - S.x), FW = -2 * m * del() * S.v, kF = 40 / (Dk * Ycm / 100);
+        const lD = clamp(FD * kF, -80, 80), y0D = mY + (lD > 0 ? -bs / 2 : bs / 2);
+        if (arrow(ctx, cx - bs * 0.2, y0D, 0, -lD, C.cF, 3)) sym(ctx, cx - bs * 0.2 - 24, y0D - lD * 0.6, 'F', 'D', C.cF);
+        const lW = clamp(FW * kF, -80, 80);
+        if (arrow(ctx, cx + bs * 0.2, mY, 0, -lW, C.heat, 3)) sym(ctx, cx + bs * 0.2 + 6, mY - lW * 0.6, 'F', 'W', C.heat);
+      }
+
+      /* ---- resonance plot: A(Ω) and φ(Ω) ---- */
+      const Yr = niceCeil(Math.max(1.2, ampMax() / s0 * 1.1));   // A in cm (s0 = 1 cm)
+      const RX = r => gx0 + r / 3 * (gx1 - gx0), RY = a => ry1 - a / s0 / Yr * (ry1 - ry0), PY = p => ry1 - p / Math.PI * (ry1 - ry0);
+      ctx.strokeStyle = C.grid2; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(gx0, ry0 - 4); ctx.lineTo(gx0, ry1); ctx.lineTo(gx1, ry1); ctx.stroke();
+      ctx.font = `12px ${BODY}`; ctx.textBaseline = 'top'; ctx.textAlign = 'center';
+      for (let r = 0.5; r <= 3.001; r += 0.5) {
+        const x = RX(r);
+        ctx.strokeStyle = C.grid; ctx.beginPath(); ctx.moveTo(x, ry0); ctx.lineTo(x, ry1); ctx.stroke();
+        if (r < 2.4) { ctx.fillStyle = C.muted; ctx.fillText(fmt(r, r % 1 ? 1 : 0), x, ry1 + 4); }
+      }
+      ctx.fillStyle = C.muted; ctx.fillText('0', gx0, ry1 + 4);
+      text(ctx, 'Ω / ω₀', gx1, ry1 + 4, C.ink, `italic 13px ${MATH}`, 'right', 'top');
+      if (S.gs.A) {
+        for (const a of [Yr / 2, Yr]) { ctx.strokeStyle = C.grid; ctx.beginPath(); ctx.moveTo(gx0, RY(a * s0)); ctx.lineTo(gx1, RY(a * s0)); ctx.stroke(); }
+        for (const a of [0, Yr / 2, Yr]) text(ctx, fmt(a, a % 1 ? 1 : 0), gx0 - 5, RY(a * s0), C.cx, `12px ${BODY}`, 'right');
+        text(ctx, 'A / cm', gx0 + 6, ry0 - 2, C.cx, `italic 13px ${MATH}`, 'left', 'top');
+      }
+      if (phiOn) {
+        for (const [p, l] of [[0, '0°'], [Math.PI / 2, '90°'], [Math.PI, '180°']]) text(ctx, l, gx1 + 5, PY(p), C.phs, `12px ${BODY}`, 'left');
+        text(ctx, 'φ', gx1 - 4, ry0 - 2, C.phs, `italic 14px ${MATH}`, 'right', 'top');
+        ctx.setLineDash([2, 4]); ctx.strokeStyle = C.phs; ctx.globalAlpha = 0.5; ctx.beginPath(); ctx.moveTo(gx0, PY(Math.PI / 2)); ctx.lineTo(gx1, PY(Math.PI / 2)); ctx.stroke(); ctx.globalAlpha = 1; ctx.setLineDash([]);
+      }
+      // ω0 marker
+      ctx.setLineDash([4, 4]); ctx.strokeStyle = C.mark; ctx.globalAlpha = 0.6; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(RX(1), ry0); ctx.lineTo(RX(1), ry1); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
+      ctx.save(); ctx.beginPath(); ctx.rect(gx0 + 1, ry0 - 6, gx1 - gx0, ry1 - ry0 + 6); ctx.clip();
+      const curveR = (f, col, lw, dash = [], alpha = 1) => {
+        ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.setLineDash(dash); ctx.globalAlpha = alpha; ctx.lineJoin = 'round'; ctx.beginPath();
+        const N = 360; for (let i = 0; i <= N; i++) { const r = 3 * i / N, y = f(Math.max(r, 1e-4)); i ? ctx.lineTo(RX(r), y) : ctx.moveTo(RX(r), y); }
+        ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
+      };
+      if (S.show.fam && S.gs.A) for (const z of [0.05, 0.1, 0.2, 0.4, 0.7]) if (Math.abs(z - S.zeta) > 0.005) curveR(r => RY(amp(r, z)), C.grid2, 1.4);
+      if (phiOn) curveR(r => PY(phase(r)), C.phs, 2);
+      if (S.gs.A) curveR(r => RY(amp(r)), C.cx, 2.8);
+      if (S.gs.A && S.trace.z === S.zeta && S.trace.pts.length > 1) {
+        ctx.strokeStyle = C.ink; ctx.lineWidth = 1.6; ctx.globalAlpha = 0.8; ctx.beginPath();
+        S.trace.pts.forEach(([r, a], i) => i ? ctx.lineTo(RX(r), RY(a)) : ctx.moveTo(RX(r), RY(a)));
+        ctx.stroke(); ctx.globalAlpha = 1;
+      }
+      ctx.restore();
+      const rr = rRes();
+      if (S.gs.A && rr > 0 && S.zeta <= 0.45) text(ctx, 'Resonanz', RX(rr) + 8, Math.max(ry0 + 8, RY(ampMax()) - 2), C.ink, `700 12px ${BODY}`, 'left');
+      text(ctx, 'ω₀', RX(1), ry1 - 9, C.muted, `italic 12px ${MATH}`);
+      // measured points (same damping only)
+      for (const p of S.meas) if (Math.abs(p.z - S.zeta) < 1e-6) {
+        if (S.gs.A) { ctx.fillStyle = C.ink; ctx.strokeStyle = C.halo; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(RX(p.r), RY(p.A), 4, 0, TAU); ctx.stroke(); ctx.fill(); }
+        if (phiOn && p.ph != null) { ctx.fillStyle = C.ink; ctx.beginPath(); ctx.rect(RX(p.r) - 3, PY(clamp(p.ph, 0, Math.PI)) - 3, 6, 6); ctx.fill(); }
+      }
+      // where we are now
+      const xr = RX(S.r);
+      ctx.strokeStyle = C.accent; ctx.lineWidth = 1.5; ctx.setLineDash([3, 3]);
+      ctx.beginPath(); ctx.moveTo(xr, ry0 - 2); ctx.lineTo(xr, ry1); ctx.stroke(); ctx.setLineDash([]);
+      if (phiOn) { ctx.fillStyle = C.phs; ctx.strokeStyle = C.halo; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(xr, PY(ph), 5, 0, TAU); ctx.stroke(); ctx.fill(); }
+      if (S.gs.A) {
+        ctx.fillStyle = C.cx; ctx.strokeStyle = C.halo; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(xr, clamp(RY(A), ry0 - 4, ry1), 6, 0, TAU); ctx.stroke(); ctx.fill();
+        const Am = curAmp();
+        if (Am != null && !S.steady) { ctx.strokeStyle = C.ink; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(xr, clamp(RY(Am), ry0 - 6, ry1), 7, 0, TAU); ctx.stroke(); }
+      }
+
+      /* ---- time graph: drive s(t) and mass x(t) ---- */
+      const tw0 = Math.max(0, S.t - WIN * 0.92), tw1 = tw0 + WIN;
+      const X = t => gx0 + (t - tw0) / WIN * (gx1 - gx0), Y = v => yMid - v / (Ycm / 100) * half;
+      ctx.strokeStyle = C.grid2; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(gx0, gy0 - 6); ctx.lineTo(gx0, gy1); ctx.lineTo(gx1, gy1); ctx.stroke();
+      timeTicks(ctx, X, tw0, tw1, (gx1 - gx0) / WIN, gx0, gx1, gy0, gy1);
+      ctx.strokeStyle = C.mark; ctx.beginPath(); ctx.moveTo(gx0, yMid); ctx.lineTo(gx1, yMid); ctx.stroke();
+      for (const s of [1, -1]) {
+        ctx.strokeStyle = C.grid; ctx.beginPath(); ctx.moveTo(gx0, yMid - s * half); ctx.lineTo(gx1, yMid - s * half); ctx.stroke();
+        text(ctx, fmt(s * Ycm, Ycm % 1 ? 1 : 0), gx0 - 5, yMid - s * half, C.muted, `12px ${BODY}`, 'right');
+      }
+      text(ctx, '0', gx0 - 5, yMid, C.muted, `12px ${BODY}`, 'right');
+      ctx.font = `italic 14px ${MATH}`;
+      text(ctx, 'x / cm', gx0 + 6, gy0 - 6, C.cx, `italic 14px ${MATH}`, 'left', 'bottom');
+      text(ctx, 's / cm (Antrieb)', gx0 + 6 + ctx.measureText('x / cm').width + 14, gy0 - 6, C.drv, `italic 14px ${MATH}`, 'left', 'bottom');
+      ctx.save(); ctx.beginPath(); ctx.rect(gx0 + 1, gy0 - 8, gx1 - gx0, gy1 - gy0 + 8); ctx.clip();
+      const H = S.hist;
+      const line = (fy, col, lw, dash = [], alpha = 1) => {
+        ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.setLineDash(dash); ctx.globalAlpha = alpha; ctx.lineJoin = 'round'; ctx.beginPath();
+        let st = false;
+        for (const r of H) { if (r[0] < tw0 - 0.05) continue; const x = X(r[0]), y = fy(r); if (!st) { ctx.moveTo(x, y); st = true; } else ctx.lineTo(x, y); }
+        ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
+      };
+      line(r => Y(r[2]), C.drv, 2);
+      if (S.show.sol) line(r => Y(A * Math.cos(r[3] - ph)), C.ink, 1.6, [5, 5], 0.55);
+      line(r => Y(r[1]), C.cx, 3);
+      ctx.fillStyle = C.drv; ctx.beginPath(); ctx.arc(X(S.t), Y(sNow), 3.5, 0, TAU); ctx.fill();
+      ctx.fillStyle = C.cx; ctx.beginPath(); ctx.arc(X(S.t), Y(S.x), 4.5, 0, TAU); ctx.fill();
+      ctx.restore();
+      ctx.setLineDash([2, 4]); ctx.strokeStyle = C.cx; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(cx + bs / 2 + 4, mY); ctx.lineTo(X(S.t), Y(S.x)); ctx.stroke(); ctx.setLineDash([]);
+    }
+
+    /* ---------- selector on the canvas: amplitude and/or phase ---------- */
+    gsel.innerHTML = [['A', 'A', 'Amplitude A(Ω)'], ['phi', 'φ', 'Phasenverschiebung φ(Ω)']]
+      .map(([k, lab, t]) => `<button type="button" role="checkbox" data-g="${k}" aria-checked="${!!S.gs[k]}" title="${t}" aria-label="${t}">${lab}</button>`).join('');
+    gsel.addEventListener('click', e => {
+      const b = e.target.closest('[data-g]'); if (!b) return;
+      const k = b.dataset.g;
+      if (S.gs[k] && Object.values(S.gs).filter(Boolean).length === 1) return;
+      S.gs[k] = !S.gs[k]; b.setAttribute('aria-checked', String(S.gs[k])); S.dirty = true;
+    });
+
+    /* ---------- direct tuning in the resonance plot ---------- */
+    let drag = false;
+    const inPlot = (px, py) => { const g = S.geo; return g && px >= g.gx0 - 12 && px <= g.gx1 + 12 && py >= g.ry0 - 12 && py <= g.ry1 + 18; };
+    const pos = e => { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+    function setFromPx(px) { const g = S.geo; const r = clamp(Math.round((px - g.gx0) / (g.gx1 - g.gx0) * 300) / 100, 0.1, 3); if (r !== S.r) setR(r); }
+    cv.addEventListener('pointerdown', e => { const [px, py] = pos(e); if (!inPlot(px, py)) return; drag = true; try { cv.setPointerCapture(e.pointerId); } catch (_) { /* ignore */ } setFromPx(px); });
+    cv.addEventListener('pointermove', e => { const [px, py] = pos(e); if (drag) setFromPx(px); else cv.style.cursor = inPlot(px, py) ? 'ew-resize' : ''; });
+    const end = () => { drag = false; };
+    cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
+
+    function setR(r) {
+      if (S.sweep) { S.sweep = false; syncSweep(); }
+      S.r = r; S.tChange = S.t; $('#f-r').value = r; S.dirty = true; ui(true);
+    }
+    function setZ(z) {
+      S.zeta = z; S.tChange = S.t; $('#f-z').value = z;
+      if (S.trace.z !== z) S.trace = { z, pts: [] };
+      S.dirty = true; ui(true); measNote();
+    }
+    function syncSweep() {
+      const b = $('#f-sweep');
+      b.setAttribute('aria-pressed', String(S.sweep));
+      b.textContent = S.sweep ? 'Durchfahren stoppen' : 'Ω langsam durchfahren';
+    }
+    function measNote() {
+      const n = S.meas.filter(p => Math.abs(p.z - S.zeta) < 1e-6).length;
+      $('#f-measNote').innerHTML = `<b>Messpunkte:</b> Sobald die Schwingung eingeschwungen ist, wird ihre Amplitude als schwarzer Punkt ins Resonanzdiagramm eingetragen, die gemessene Phase als Quadrat. Stelle nacheinander verschiedene Ω ein und warte jeweils. ` +
+        (n ? `Bisher ${n} Punkt${n > 1 ? 'e' : ''} für <span class="m">δ</span> = ${fmt(S.zeta, 2)} <span class="m">ω<sub>0</sub></span>.` : 'Noch keine Punkte für diese Dämpfung.') +
+        ' Der schwarze Ring zeigt die Amplitude der letzten Periode, solange das Einschwingen noch läuft. Beim Durchfahren entsteht eine Spur.';
+    }
+
+    /* ---------- panel ---------- */
+    let lastKey = '';
+    function ui(force) {
+      const O = Om(), A = amp(S.r), ph = phase(S.r), Am = curAmp(), rr = rRes(), d = del(), dev = devi();
+      const rows = [
+        ['Zeit <span class="m">t</span>', 's', fmt(S.t, 2)],
+        ['Antriebsfrequenz <span class="m">Ω</span>', '1/s', fmt(O, 2)],
+        ['<span class="m">Ω / ω<sub>0</sub></span>', '', fmt(S.r, 2)],
+        ['Antrieb <span class="m">f = Ω / 2π</span>', 'Hz', fmt(O / TAU, 2)],
+        ['<span class="t-cx">Auslenkung Masse</span> <span class="m">x</span>', 'cm', fmt(S.x * 100, 2)],
+        ['<span class="t-drv">Auslenkung Antrieb</span> <span class="m">s</span>', 'cm', fmt(s0 * Math.cos(S.th) * 100, 2)],
+        ['Amplitude <span class="m">A(Ω)</span>, Theorie', 'cm', fmt(A * 100, 2)],
+        ['Amplitude gemessen (letzte Periode)', 'cm', Am != null ? fmt(Am * 100, 2) : '—'],
+        ['Phasenverschiebung <span class="m">φ</span>, Theorie', '°', fmt(ph * DEG)],
+        ['<span class="m">φ</span> gemessen', '°', S.phMeas != null ? fmt(S.phMeas * DEG) : '—'],
+        ['Abweichung von <span class="m">x<sub>∞</sub>(t)</span>', '%', fmt(dev * 100, dev < 0.1 ? 1 : 0)],
+        ['Eigenfrequenz <span class="m">ω<sub>0</sub> = √(D/m)</span>', '1/s', fmt(w0, 2)],
+        ['Abklingkonstante <span class="m">δ</span>', '1/s', fmt(d, 2)],
+        ['Resonanz <span class="m">ω<sub>r</sub> = √(ω<sub>0</sub>² − 2δ²)</span>', '1/s', rr > 0 ? fmt(rr * w0, 2) : 'keine'],
+        ['Grösste Amplitude <span class="m">A<sub>max</sub></span>', 'cm', fmt(ampMax() * 100, 2)],
+        ['Güte <span class="m">Q = ω<sub>0</sub> / 2δ</span>', '', fmt(1 / (2 * S.zeta), 1)],
+        ['Einschwingzeit, etwa <span class="m">4/δ</span>', 's', fmt(4 / d, 1)],
+      ];
+      setHTML($('#f-num'), tableRows(rows));
+      if (force || sweepTick) {
+        sweepTick = false;
+        $('#f-rOut').textContent = `${fmt(S.r, 2)}, Ω = ${fmt(O, 2)} 1/s, f = ${fmt(O / TAU, 2)} Hz`;
+        $('#f-zOut').textContent = `${fmt(S.zeta, 2)}, δ = ${fmt(d, 2)} 1/s`;
+        $$('[data-fz]').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.fz === S.zeta)));
+        $$('[data-fr]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.fr === 'res' ? rr > 0 && Math.abs(S.r - Math.round(rr * 100) / 100) < 1e-9 : +b.dataset.fr === S.r)));
+        $('#f-zNote').innerHTML = rr > 0
+          ? `Resonanz bei <span class="m">ω<sub>r</sub></span> = ${fmt(rr, 3)} <span class="m">ω<sub>0</sub></span>, dort ist <span class="m">A<sub>max</sub></span> = ${fmt(ampMax() * 100, 1)} cm, also ${fmt(ampMax() / s0, 1)}-mal die Bewegung des Antriebs. Je schwächer die Dämpfung, desto höher und schmaler die Spitze, und desto länger dauert das Einschwingen (etwa <span class="m">4/δ</span> = ${fmt(4 / d, 1)} s).`
+          : `Bei so starker Dämpfung (<span class="m">δ &gt; ω<sub>0</sub>/√2</span>) gibt es kein Maximum mehr: Die Amplitude wird mit wachsendem Ω nur kleiner.`;
+        if (force) writeEq();
+      }
+      if (force) writeDgl();
+      explain();
+    }
+
+    function explain() {
+      const r = S.r, z = S.zeta, rr = rRes(), A = amp(r), ph = phase(r) * DEG, dev = devi();
+      const pill = S.run ? 'Läuft' : 'Pause', st = S.run ? 'on' : 'end';
+      let title, txt;
+      const regime = rr > 0 && Math.abs(r - rr) <= Math.max(z, 0.03) ? 'res' : r <= 0.6 ? 'low' : r >= 1.5 ? 'high' : r < (rr || 1) ? 'below' : 'above';
+      const nums = `Ω = ${fmt(r, 2)} <span class="m">ω<sub>0</sub></span>`;
+      if (S.sweep) {
+        title = 'Ω wird langsam erhöht';
+        txt = `Die Antriebsfrequenz steigt von selbst, gerade ist ${nums}. Beobachte die Amplitude: Sie wächst bis zur Resonanz und fällt danach wieder. Die schwarze Spur im Resonanzdiagramm zeigt, was gemessen wird. Weil das Einschwingen Zeit braucht, hinkt die Spur der Kurve etwas hinterher. Tipp: Tempo 4×.`;
+      } else if (dev > 0.05) {
+        title = 'Einschwingvorgang';
+        txt = `Noch überlagern sich zwei Schwingungen: die Eigenschwingung der Feder mit etwa <span class="m">ω<sub>0</sub></span> und die erzwungene Schwingung mit Ω. Die Eigenschwingung klingt mit <span class="m">e<sup>−δt</sup></span> ab. Nach etwa <span class="m">4/δ</span> = ${fmt(4 / del(), 1)} s ist nur noch die erzwungene Schwingung übrig.` +
+          (Math.abs(r - 1) > 0.04 && Math.abs(r - 1) < 0.4 && z < 0.2 ? ' Weil Ω nahe bei <span class="m">ω<sub>0</sub></span> liegt, wird die Amplitude abwechselnd grösser und kleiner: eine Schwebung.' : '');
+      } else {
+        const tail = ' Die Masse schwingt jetzt genau mit der Frequenz des Antriebs, nicht mit ihrer Eigenfrequenz.';
+        if (regime === 'res') {
+          title = 'Resonanz: Die Amplitude ist am grössten';
+          txt = `Bei ${nums} schwingt die Masse mit <span class="m">A</span> = ${fmt(A * 100, 1)} cm, ${fmt(A / s0, 1)}-mal so weit wie der Antrieb. Sie hinkt dem Antrieb um <span class="m">φ</span> ≈ ${fmt(ph)}° hinterher. Dann zieht die Feder immer in die Richtung, in die sich die Masse gerade bewegt, und der Antrieb gibt in jeder Periode viel Energie ab. Die Reibung wandelt genauso viel in Wärme um.`;
+        } else if (regime === 'low') {
+          title = 'Langsamer Antrieb: Die Masse folgt';
+          txt = `Bei ${nums} folgt die Masse dem Antrieb fast im Gleichtakt (<span class="m">φ</span> = ${fmt(ph)}°). Die Amplitude ist ungefähr so gross wie die des Antriebs: <span class="m">A</span> = ${fmt(A * 100, 2)} cm. Die Feder wird kaum gedehnt, sie wirkt fast wie eine starre Stange.`;
+        } else if (regime === 'high') {
+          title = 'Schneller Antrieb: Die Masse kommt nicht mit';
+          txt = `Bei ${nums} ist die Masse zu träge. Sie schwingt fast gegenphasig zum Antrieb (<span class="m">φ</span> = ${fmt(ph)}°) und nur mit <span class="m">A</span> = ${fmt(A * 100, 2)} cm. Je schneller der Antrieb, desto kleiner die Amplitude.`;
+        } else if (regime === 'below') {
+          title = 'Unterhalb der Resonanz';
+          txt = `Bei ${nums} ist <span class="m">A</span> = ${fmt(A * 100, 2)} cm. Die Amplitude wächst, je näher Ω an die Resonanz kommt. Die Masse hinkt dem Antrieb um <span class="m">φ</span> = ${fmt(ph)}° hinterher.`;
+        } else {
+          title = 'Oberhalb der Resonanz';
+          txt = `Bei ${nums} ist <span class="m">A</span> = ${fmt(A * 100, 2)} cm, die Amplitude fällt wieder. Mit <span class="m">φ</span> = ${fmt(ph)}° bewegt sich die Masse schon fast entgegen dem Antrieb.`;
+        }
+        if (rr === 0) txt += ' Bei dieser starken Dämpfung gibt es keine Resonanzspitze.';
+        txt += tail;
+      }
+      const key = pill + title + txt;
+      if (key === lastKey) return;
+      lastKey = key;
+      const pe = $('#f-pill'); pe.textContent = pill; pe.dataset.state = st;
+      $('#f-eTitle').textContent = title; $('#f-eText').innerHTML = txt;
+    }
+
+    function writeEq() {
+      const O = Om(), d = del(), rr = rRes();
+      const h = eqs([D2('x') + ' + 2δ ' + D1('x') + ' + ω<sub>0</sub>² x = A<sub>0</sub> cos(Ωt)', 'Bewegungsgleichung mit periodischem Antrieb']) +
+        `<p class="note">Hier bewegt der Antrieb den Aufhängepunkt der Feder: <span class="m">s(t) = s<sub>0</sub> cos(Ωt)</span> mit <span class="m">s<sub>0</sub></span> = 1 cm. Die Feder zieht mit <span class="m">D (s − x)</span>, also ist <span class="m">A<sub>0</sub> = ω<sub>0</sub>² s<sub>0</sub></span>.</p>` +
+        eqs(['x<sub>∞</sub>(t) = A(Ω) cos(Ωt − φ)', 'nach dem Einschwingen: Frequenz des Antriebs']) +
+        eqs(['A(Ω) = A<sub>0</sub> / √((ω<sub>0</sub>² − Ω²)² + 4δ²Ω²)', 'Resonanzkurve']) +
+        eqs(['tan φ = 2δΩ / (ω<sub>0</sub>² − Ω²)', 'Phasenverschiebung, von 0° bis 180°']) +
+        eqs(['ω<sub>r</sub> = √(ω<sub>0</sub>² − 2δ²)', 'Maximum der Amplitude'], ['A<sub>max</sub> = A<sub>0</sub> / (2δ √(ω<sub>0</sub>² − δ²))', 'endlich, solange δ &gt; 0']) +
+        `<p class="optnote">Mit den Einstellungen: <span class="m">ω<sub>0</sub></span> = ${fmt(w0, 2)} 1/s, <span class="m">δ</span> = ${fmt(d, 2)} 1/s, <span class="m">Ω</span> = ${fmt(O, 2)} 1/s. Also <span class="m">A</span> = ${fmt(amp(S.r) * 100, 2)} cm und <span class="m">φ</span> = ${fmt(phase(S.r) * DEG)}°. ` +
+        (rr > 0 ? `Resonanz bei <span class="m">ω<sub>r</sub></span> = ${fmt(rr * w0, 2)} 1/s mit <span class="m">A<sub>max</sub></span> = ${fmt(ampMax() * 100, 1)} cm.` : 'Keine Resonanzspitze, weil <span class="m">δ &gt; ω<sub>0</sub>/√2</span>.') + '</p>' +
+        '<p class="note">Ohne Dämpfung wird <span class="m">ω<sub>r</sub> = ω<sub>0</sub></span> und die Amplitude wächst bei Resonanz ohne Grenze: <span class="m">A(Ω) → ∞</span> für <span class="m">Ω → ω<sub>0</sub></span>. Mit Dämpfung bleibt sie endlich.</p>';
+      setHTML($('#f-eq'), h);
+    }
+
+    function writeDgl() {
+      const d = del(), rr = rRes(), wd = w0 * Math.sqrt(Math.max(0, 1 - S.zeta ** 2));
+      const h = `<section class="group" style="border-top:0;padding-top:0" aria-labelledby="f-h-d1"><h3 id="f-h-d1">Die erzwungene Schwingung lösen</h3>` +
+        stepBox(1, `<p><b>Bewegungsgleichung.</b> Der Aufhängepunkt bewegt sich mit <span class="m">s(t) = s<sub>0</sub> cos(Ωt)</span>. Die Feder zieht mit <span class="m">−D (x − s)</span>, die Flüssigkeit bremst mit <span class="m">−b ${D1('x')}</span>:</p>${eqn('m ' + D2('x') + ' = −D (x − s) − b ' + D1('x'))}${eqn(D2('x') + ' + 2δ ' + D1('x') + ' + ω<sub>0</sub>² x = ω<sub>0</sub>² s<sub>0</sub> cos(Ωt) = A<sub>0</sub> cos(Ωt)')}<p>Der Antrieb ist eine äussere Kraft, die nicht von <span class="m">x</span> abhängt.</p>`) +
+        stepBox(2, `<p><b>Zwei Teile.</b> Die Lösung ist die Summe aus der Lösung ohne Antrieb (Seite 1) und einer speziellen Lösung mit Antrieb:</p>${eqn('x(t) = x<sub>h</sub>(t) + x<sub>∞</sub>(t)')}<p>Der erste Teil klingt mit <span class="m">e<sup>−δt</sup></span> ab, das ist der Einschwingvorgang. Übrig bleibt <span class="m">x<sub>∞</sub></span>, und das schwingt mit Ω. Darum übernimmt ein angetriebener Oszillator nach einer gewissen Zeit immer die Frequenz des Antriebs.</p>`) +
+        stepBox(3, `<p><b>Komplexer Ansatz.</b> Schreibe den Antrieb als Realteil von <span class="m">A<sub>0</sub> e<sup>iΩt</sup></span> und probiere <span class="m">x<sub>∞</sub> = Â e<sup>iΩt</sup></span>. Jede Ableitung gibt einen Faktor <span class="m">iΩ</span>:</p>${eqn('(−Ω² + 2iδΩ + ω<sub>0</sub>²) Â = A<sub>0</sub>')}${eqn('Â = A<sub>0</sub> / (ω<sub>0</sub>² − Ω² + 2iδΩ)')}`) +
+        stepBox(4, `<p><b>Betrag und Phase.</b> Der Betrag von <span class="m">Â</span> ist die Amplitude, sein Winkel die Verschiebung gegenüber dem Antrieb:</p>${eqn('A(Ω) = A<sub>0</sub> / √((ω<sub>0</sub>² − Ω²)² + 4δ²Ω²)')}${eqn('tan φ = 2δΩ / (ω<sub>0</sub>² − Ω²)')}
+          <div class="tablewrap"><table><thead><tr><th scope="col" style="text-align:left">Antrieb</th><th scope="col">Amplitude</th><th scope="col">Phase</th></tr></thead><tbody>
+          <tr><th scope="row">langsam, <span class="m">Ω ≪ ω<sub>0</sub></span></th><td><span class="m">A ≈ A<sub>0</sub>/ω<sub>0</sub>² = s<sub>0</sub></span></td><td>0°</td></tr>
+          <tr><th scope="row"><span class="m">Ω = ω<sub>0</sub></span></th><td><span class="m">A = s<sub>0</sub> ω<sub>0</sub> / 2δ</span></td><td>90°</td></tr>
+          <tr><th scope="row">schnell, <span class="m">Ω ≫ ω<sub>0</sub></span></th><td><span class="m">A ≈ A<sub>0</sub>/Ω² → 0</span></td><td>180°</td></tr>
+          </tbody></table></div>`) +
+        stepBox(5, `<p><b>Wo ist das Maximum?</b> <span class="m">A</span> ist am grössten, wenn der Ausdruck unter der Wurzel am kleinsten ist. Ableiten nach <span class="m">Ω²</span> und null setzen:</p>${eqn('−2(ω<sub>0</sub>² − Ω²) + 4δ² = 0 &nbsp; ⇒ &nbsp; ω<sub>r</sub> = √(ω<sub>0</sub>² − 2δ²)')}${eqn('A<sub>max</sub> = A<sub>0</sub> / (2δ √(ω<sub>0</sub>² − δ²))')}<p>Ein Maximum gibt es nur, solange <span class="m">δ &lt; ω<sub>0</sub>/√2</span>.</p>
+          <p class="optnote">Achtung, Verwechslungsgefahr: <span class="m">√(ω<sub>0</sub>² − δ²)</span> ist die Frequenz <span class="m">ω<sub>d</sub></span> der freien gedämpften Schwingung (Seite 1). Das Maximum der erzwungenen Amplitude liegt etwas tiefer, bei <span class="m">√(ω<sub>0</sub>² − 2δ²)</span>. Bei schwacher Dämpfung ist der Unterschied winzig. Mit den Einstellungen: <span class="m">ω<sub>d</sub></span> = ${fmt(wd, 3)} 1/s, <span class="m">ω<sub>r</sub></span> = ${rr > 0 ? fmt(rr * w0, 3) + ' 1/s' : 'keine'}. Stelle eine starke Dämpfung ein (z. B. 0.5) und lies das Maximum im Diagramm ab.</p>`) +
+        stepBox(6, `<p><b>Energiebilanz.</b> Im eingeschwungenen Zustand gibt der Antrieb pro Periode genau so viel Energie ab, wie die Reibung in Wärme umwandelt. Der Antrieb leistet am meisten, wenn die Federkraft im Takt mit der Geschwindigkeit der Masse ist, also bei <span class="m">φ = 90°</span>. Das ist genau bei <span class="m">Ω = ω<sub>0</sub></span> der Fall.</p><p class="optnote">Mit den Einstellungen: <span class="m">δ</span> = ${fmt(d, 2)} 1/s, Güte <span class="m">Q = ω<sub>0</sub>/2δ</span> = ${fmt(1 / (2 * S.zeta), 1)}. Die Resonanzspitze ist ungefähr <span class="m">2δ</span> = ${fmt(2 * d, 2)} 1/s breit.</p>`) +
+        '</section>';
+      setHTML($('#f-dglBox'), h);
+    }
+
+    function writeTry() {
+      const T = [
+        ['Folie, Frage b): Ein periodisch angetriebener Oszillator übernimmt nach einer gewissen Zeit immer die Frequenz der Anregung. Stimmt das?', 'Ja. Stelle Ω = 2 <span class="m">ω<sub>0</sub></span> ein und warte, bis die Abweichung in der Tabelle klein ist. Im Graphen haben <span class="m">x(t)</span> und <span class="m">s(t)</span> dann dieselbe Periode. Die Eigenschwingung mit <span class="m">ω<sub>0</sub></span> ist mit dem Einschwingvorgang abgeklungen.'],
+        ['Miss die Resonanzkurve aus.', 'Stelle nacheinander zum Beispiel Ω = 0.5, 0.8, 0.9, 0.95, 1, 1.05, 1.1, 1.3, 2 <span class="m">ω<sub>0</sub></span> ein (am schnellsten im Diagramm anklicken) und warte jeweils, bis der Messpunkt erscheint. Mit Tempo 4× geht es schneller. Die Punkte liegen auf der Kurve.'],
+        ['Wie liegen Antrieb und Masse zueinander? Schau auf die beiden Kurven im Zeitgraphen.', 'Weit unter der Resonanz laufen sie im Gleichtakt (<span class="m">φ ≈ 0°</span>). In der Resonanz hinkt die Masse eine Viertelperiode hinterher (<span class="m">φ ≈ 90°</span>). Weit darüber ist sie gegenphasig (<span class="m">φ ≈ 180°</span>): Geht der Antrieb hoch, geht die Masse runter.'],
+        ['Halbiere die Dämpfung. Was passiert mit der Resonanzspitze?', 'Sie wird etwa doppelt so hoch und halb so breit. Dafür dauert das Einschwingen doppelt so lange, denn es geht mit <span class="m">e<sup>−δt</sup></span>. Schalte „Kurven für andere Dämpfungen“ ein, um die Schar zu sehen.'],
+        ['Schaukel: Wann muss man anschubsen, damit sie immer höher schwingt?', 'Immer in Bewegungsrichtung, also im Takt mit der Geschwindigkeit. Das ist die Resonanzbedingung <span class="m">φ = 90°</span>: Die Kraft eilt der Auslenkung um eine Viertelperiode voraus. Wer zur falschen Zeit schubst, bremst die Schaukel.'],
+        ['Stelle schwache Dämpfung und Ω = 0.9 <span class="m">ω<sub>0</sub></span> ein und drücke auf Neustart. Was siehst du am Anfang?', 'Eine Schwebung: Die Amplitude wird abwechselnd grösser und kleiner. Eigenschwingung (etwa <span class="m">ω<sub>0</sub></span>) und erzwungene Schwingung (Ω) laufen auseinander und wieder zusammen. Die Schwebung verschwindet, sobald die Eigenschwingung abgeklungen ist.'],
+        ['Folie, Gehörgang: Was zeigt die Grafik der Schwingungsamplitude im Gehörgang?', 'd) ist richtig: Töne um 3000 Hz schwingen im Gehörgang stärker als Töne um 10 000 Hz. Die Grafik ist eine Resonanzkurve wie hier, nur mit logarithmischen Achsen. Bei a) und c) ist es genau umgekehrt: Um 4000 bis 5000 Hz liegt die Resonanzspitze, dort ist das Ohr besonders empfindlich. b) verwechselt die Amplitude mit der Geschwindigkeit.'],
+        ['Folie, Tacoma-Brücke: Ist das ein Beispiel für Resonanz?', 'Es wird oft so gezeigt, ist aber genauer ein Verwandter: Der Wind hatte keine feste Frequenz. Die Bewegung der Brücke hat die Windkräfte selbst so geformt, dass sie im Takt mit der Bewegung wirkten (Flattern). Wie bei der Resonanz bekam die Brücke pro Schwingung mehr Energie, als die Dämpfung abführen konnte.'],
+        ['Stelle eine sehr starke Dämpfung ein (<span class="m">δ</span> = 0.8 <span class="m">ω<sub>0</sub></span>). Gibt es noch eine Resonanz?', 'Nein. Die Kurve fällt von Anfang an. Ein Maximum gibt es nur für <span class="m">δ &lt; ω<sub>0</sub>/√2 ≈ 0.71 ω<sub>0</sub></span>. Darum dämpft man Bauteile, die nicht in Resonanz geraten dürfen.'],
+      ];
+      $('#f-try').innerHTML = detailsList(T);
+      $('#f-foot').innerHTML = `Masse <span class="m">m</span> = 0.5 kg, Feder <span class="m">D</span> = 20 N/m, also <span class="m">ω<sub>0</sub></span> = ${fmt(w0, 2)} 1/s (<span class="m">f<sub>0</sub></span> = ${fmt(w0 / TAU, 2)} Hz). Der Antrieb bewegt den Aufhängepunkt um <span class="m">s<sub>0</sub></span> = 1 cm auf und ab, darum ist die Amplitude in cm zugleich die Verstärkung <span class="m">A/s<sub>0</sub></span>. Die Reibung ist proportional zur Geschwindigkeit. Gerechnet wird mit dem Runge-Kutta-Verfahren in Schritten von 0.5 ms. Ein Messpunkt wird eingetragen, sobald die Bewegung weniger als 1.5 % von der eingeschwungenen Lösung abweicht.`;
+    }
+
+    /* ---------- inputs ---------- */
+    $('#f-r').addEventListener('input', e => setR(+e.target.value));
+    $('#f-z').addEventListener('input', e => setZ(+e.target.value));
+    $$('[data-fz]').forEach(b => b.addEventListener('click', () => setZ(+b.dataset.fz)));
+    $$('[data-fr]').forEach(b => b.addEventListener('click', () => {
+      const v = b.dataset.fr === 'res' ? Math.max(0.1, Math.round(rRes() * 100) / 100) : +b.dataset.fr;
+      setR(v);
+    }));
+    $('#f-sweep').addEventListener('click', () => {
+      S.sweep = !S.sweep;
+      if (S.sweep) {
+        if (S.r > SWEEP_END - 0.3) S.r = 0.2;
+        S.trace = { z: S.zeta, pts: [] }; S.tChange = S.t; $('#f-r').value = S.r;
+        if (!S.run) { S.run = true; syncPlay('f'); }
+      }
+      syncSweep(); S.dirty = true; ui(true);
+    });
+    $$('input[name="f-tempo"]').forEach(r => r.addEventListener('change', () => { S.tempo = +r.value; }));
+    [['f-sol', 'sol'], ['f-F', 'F'], ['f-fam', 'fam']].forEach(([id, k]) => $('#' + id).addEventListener('change', e => { S.show[k] = e.target.checked; S.dirty = true; }));
+    $('#f-clear').addEventListener('click', () => { S.meas = []; S.trace = { z: S.zeta, pts: [] }; measNote(); S.dirty = true; });
+
+    writeTry(); measNote(); syncSweep();
+    return { S, draw, step, ui, reset, init: reset };
+  })();
+
+  /* =====================================================================
+     Seite 3: Wellen. Zwei Wellen auf einem langen Seil, exakt berechnet:
+     Ψ1 hängt nur von x − c t ab (läuft nach rechts), Ψ2 nur von x + c t (läuft nach links).
+     ===================================================================== */
+  PG.w = (() => {
+    const cv = $('#w-cv'), gsel = $('#w-gsel');
+    const L = 8;
+    const FORM = { puls: 'Puls', zug: 'Wellenzug', dauer: 'Dauerwelle' };
+    const PRESETS = {
+      versch: [{ form: 'puls', A: 16, b: 1.2 }, { form: 'puls', A: 9, b: 2.4 }],
+      berge: [{ form: 'puls', A: 14, b: 1.6 }, { form: 'puls', A: 14, b: 1.6 }],
+      bergtal: [{ form: 'puls', A: 14, b: 1.6 }, { form: 'puls', A: -14, b: 1.6 }],
+      zuege: [{ form: 'zug', A: 10, lam: 1.2, n: 3 }, { form: 'zug', A: 10, lam: 2, n: 2 }],
+      stehend: [{ form: 'dauer', A: 8, lam: 2 }, { form: 'dauer', A: 8, lam: 2 }],
+    };
+    const S = {
+      c: 2, xT: 4, xP: 2,
+      w: [{ on: true, form: 'puls', A: 16, b: 1.2, lam: 1.2, n: 3 }, { on: true, form: 'puls', A: 9, b: 2.4, lam: 2, n: 3 }],
+      t: 0, run: true, tempo: 0.5, dirty: true, mode: 'xt', show: { comp: true, beads: false, vel: false },
+      t1: 0.15, t2: 0.15, tEnd: 6, tView: 6, geo: null, preset: 'versch', maxSum: 0,
+    };
+    const per = wv => (wv.form === 'puls' ? wv.b : wv.lam) / S.c;   // duration of a pulse, or the period T = λ/c
+    const dur = wv => wv.form === 'puls' ? wv.b / S.c : wv.form === 'zug' ? wv.n * wv.lam / S.c : Infinity;
+    // displacement made by one wave, as a function of the time τ since its front passed
+    function g(wv, tau) {
+      if (!wv.on || tau <= 0) return 0;
+      const T = per(wv);
+      if (wv.form === 'puls') { if (tau >= T) return 0; const s = Math.sin(Math.PI * tau / T); return wv.A * s * s; }
+      if (wv.form === 'zug' && tau >= wv.n * T) return 0;
+      return wv.A * Math.sin(TAU * tau / T);
+    }
+    function gd(wv, tau) {   // its time derivative: how fast that piece of rope moves up or down
+      if (!wv.on || tau <= 0) return 0;
+      const T = per(wv);
+      if (wv.form === 'puls') { if (tau >= T) return 0; return wv.A * Math.PI / T * Math.sin(TAU * tau / T); }
+      if (wv.form === 'zug' && tau >= wv.n * T) return 0;
+      return wv.A * TAU / T * Math.cos(TAU * tau / T);
+    }
+    const psi1 = (x, t) => g(S.w[0], t - S.t1 - x / S.c);
+    const psi2 = (x, t) => g(S.w[1], t - S.t2 - (L - x) / S.c);
+    const vel = (x, t) => gd(S.w[0], t - S.t1 - x / S.c) + gd(S.w[1], t - S.t2 - (L - x) / S.c);
+    const tMax = () => isFinite(S.tEnd) ? S.tEnd : Math.max(S.tView, S.t);
+
+    // start times so that the two fronts meet at xT
+    function sched() {
+      const [a, b] = S.w, t0 = 0.15, d = (L - 2 * S.xT) / S.c;
+      if (a.on && b.on) { if (d >= 0) { S.t2 = t0; S.t1 = t0 + d; } else { S.t1 = t0; S.t2 = t0 - d; } }
+      else { S.t1 = t0; S.t2 = t0; }
+      const e = [];
+      if (a.on) e.push(S.t1 + dur(a) + L / S.c);
+      if (b.on) e.push(S.t2 + dur(b) + L / S.c);
+      S.tEnd = e.length ? Math.max(...e) + 0.2 : 2;
+      S.tView = isFinite(S.tEnd) ? S.tEnd : Math.max(a.on ? S.t1 : 0, b.on ? S.t2 : 0) + 2.5 * L / S.c;
+      S.t = clamp(S.t, 0, tMax());
+    }
+    // where the waves are: wave 1 covers [tl1, f1], wave 2 covers [f2, tl2]
+    function status() {
+      const [a, b] = S.w, t = S.t, c = S.c;
+      const f1 = c * (t - S.t1), tl1 = f1 - c * dur(a);
+      const f2 = L - c * (t - S.t2), tl2 = f2 + c * dur(b);
+      const in1 = a.on && f1 > 0 && tl1 < L, in2 = b.on && f2 < L && tl2 > 0;
+      const lo = Math.max(tl1, f2, 0), hi = Math.min(f1, tl2, L);
+      return { f1, tl1, f2, tl2, in1, in2, overlap: a.on && b.on && lo < hi, met: a.on && b.on && f1 >= f2, passed: a.on && b.on && tl1 >= tl2 };
+    }
+    function reset() { S.t = 0; sched(); S.dirty = true; ui(true); }
+    function step(dt) {
+      S.t += dt;
+      if (isFinite(S.tEnd) && S.t >= S.tEnd) { S.t = S.tEnd; S.run = false; syncPlay('w'); }
+      S.dirty = true;
+    }
+
+    /* ---------- drawing ---------- */
+    const off = document.createElement('canvas'); let img = null;
+    function draw() {
+      const { ctx, w, h } = fit(cv);
+      ctx.clearRect(0, 0, w, h);
+      gsel.style.left = '116px';
+      const top0 = 58, px0 = 48, px1 = w - 16;
+      const avail = h - top0 - 26;
+      const ry0 = top0 + 6, ry1 = top0 + Math.round(avail * 0.45);
+      const by0 = ry1 + 44, by1 = h - 26;
+      const t = S.t, [a, b] = S.w, span = S.tView, tA = Math.max(0, t - span);
+      S.geo = { px0, px1, ry0, ry1, by0, by1, tA };
+      const X = x => px0 + x / L * (px1 - px0);
+      const Aref = Math.max(4, (a.on ? Math.abs(a.A) : 0) + (b.on ? Math.abs(b.A) : 0));
+      const yr = (ry0 + ry1) / 2 + 8, hr = 0.36 * (ry1 - ry0);
+      const Y = p => yr - p / Aref * hr;
+      const st = status();
+
+      text(ctx, `t = ${fmt(t, 2)} s`, w - 60, 28, C.ink, `italic 16px ${MATH}`, 'right');
+
+      /* ---- the rope: a photo at time t ---- */
+      ctx.lineWidth = 1; ctx.font = `12px ${BODY}`; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      for (let x = 0; x <= L; x++) {
+        ctx.strokeStyle = C.grid; ctx.beginPath(); ctx.moveTo(X(x), ry0 + 20); ctx.lineTo(X(x), ry1); ctx.stroke();
+        if (x < L) { ctx.fillStyle = C.muted; ctx.fillText(fmt(x), X(x), ry1 + 3); }
+      }
+      text(ctx, 'x / m', px1, ry1 + 3, C.ink, `italic 13px ${MATH}`, 'right', 'top');
+      for (const v of [Aref, 0, -Aref]) text(ctx, fmt(v), px0 - 6, Y(v), C.muted, `12px ${BODY}`, 'right');
+      text(ctx, 'Ψ / cm', px0 - 6, Y(Aref) - 16, C.ink, `italic 13px ${MATH}`, 'right');
+      ctx.setLineDash([3, 4]); ctx.strokeStyle = C.equi; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(px0, yr); ctx.lineTo(px1, yr); ctx.stroke(); ctx.setLineDash([]);
+      if (a.on && b.on && !st.met) {   // where the fronts will meet
+        const xm = X(S.xT);
+        ctx.fillStyle = C.muted; ctx.beginPath(); ctx.moveTo(xm, yr + 5); ctx.lineTo(xm - 5, yr + 13); ctx.lineTo(xm + 5, yr + 13); ctx.closePath(); ctx.fill();
+        text(ctx, 'Treffpunkt', xm, yr + 24, C.muted, `11px ${BODY}`);
+      }
+      const N = Math.max(120, Math.round((px1 - px0) / 2));
+      const P1 = new Float64Array(N + 1), P2 = new Float64Array(N + 1);
+      let mxs = 0;
+      for (let i = 0; i <= N; i++) { const x = L * i / N; P1[i] = psi1(x, t); P2[i] = psi2(x, t); mxs = Math.max(mxs, Math.abs(P1[i] + P2[i])); }
+      S.maxSum = mxs;
+      const path = f => { ctx.beginPath(); for (let i = 0; i <= N; i++) { const xx = px0 + (px1 - px0) * i / N, yy = Y(f(i)); i ? ctx.lineTo(xx, yy) : ctx.moveTo(xx, yy); } };
+      ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+      if (S.show.comp && a.on && b.on) {
+        ctx.setLineDash([6, 5]); ctx.lineWidth = 2;
+        ctx.strokeStyle = C.w1; path(i => P1[i]); ctx.stroke();
+        ctx.strokeStyle = C.w2; path(i => P2[i]); ctx.stroke();
+        ctx.setLineDash([]);
+      }
+      ctx.strokeStyle = C.halo; ctx.lineWidth = 6; path(i => P1[i] + P2[i]); ctx.stroke();
+      ctx.strokeStyle = C.ink; ctx.lineWidth = 3; path(i => P1[i] + P2[i]); ctx.stroke();
+      if (S.show.beads || S.show.vel) {
+        let vref = 1e-9;
+        for (const wv of S.w) if (wv.on) vref = Math.max(vref, Math.abs(wv.A) * (wv.form === 'puls' ? Math.PI : TAU) / per(wv));
+        for (let j = 0; j <= 40; j++) {
+          const x = L * j / 40, xx = X(x), yy = Y(psi1(x, t) + psi2(x, t));
+          if (S.show.vel) arrow(ctx, xx, yy, 0, -clamp(vel(x, t) / vref * 30, -60, 60), C.cv, 2.2);
+          if (S.show.beads) { ctx.fillStyle = C.surface; ctx.strokeStyle = C.ink; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.arc(xx, yy, 3.4, 0, TAU); ctx.fill(); ctx.stroke(); }
+        }
+      }
+      // labels with the direction of travel
+      const labs = [];
+      const lab = (k, lo, hi, dir, col) => { lo = Math.max(lo, 0); hi = Math.min(hi, L); if (hi - lo > 0.05) labs.push({ x: X((lo + hi) / 2), k, dir, col }); };
+      if (a.on) lab(1, st.tl1, st.f1, 1, C.w1);
+      if (b.on) lab(2, st.f2, st.tl2, -1, C.w2);
+      if (labs.length === 2 && Math.abs(labs[0].x - labs[1].x) < 76) { const m = (labs[0].x + labs[1].x) / 2; labs[0].x = m + 38; labs[1].x = m - 38; }
+      for (const l of labs) {
+        const yl = ry0 + 10, x = clamp(l.x, px0 + 30, px1 - 30);
+        arrow(ctx, x - l.dir * 4, yl, l.dir * 26, 0, l.col, 2.5);
+        text(ctx, String(l.k), x - l.dir * 14, yl, l.col, `700 14px ${BODY}`);
+      }
+      // the point P: it only moves up and down
+      const pP = psi1(S.xP, t) + psi2(S.xP, t), xPp = X(S.xP);
+      ctx.setLineDash([2, 4]); ctx.strokeStyle = C.accent; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(xPp, ry0 + 22); ctx.lineTo(xPp, ry1); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = C.accent; ctx.strokeStyle = C.halo; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(xPp, Y(pP), 6.5, 0, TAU); ctx.stroke(); ctx.fill();
+      text(ctx, 'P', xPp + 11, Y(pP) - 11, C.accent, `italic 700 15px ${MATH}`, 'left');
+
+      /* ---- below: the space-time picture, or the motion of P ---- */
+      if (S.mode === 'xt') {
+        const nx = Math.max(40, Math.min(320, Math.round((px1 - px0) / 2))), nt = Math.max(30, Math.min(160, Math.round((by1 - by0) / 2)));
+        if (off.width !== nx || off.height !== nt) { off.width = nx; off.height = nt; img = null; }
+        const octx = off.getContext('2d');
+        if (!img) img = octx.createImageData(nx, nt);
+        const d = img.data, Pc = RGB.pos, Nc = RGB.neg;
+        for (let j = 0; j < nt; j++) {
+          const tt = tA + (j + 0.5) / nt * span;
+          for (let i = 0; i < nx; i++) {
+            const o = (j * nx + i) * 4;
+            if (tt > t) { d[o + 3] = 0; continue; }
+            const x = (i + 0.5) / nx * L, v = (psi1(x, tt) + psi2(x, tt)) / Aref, col = v >= 0 ? Pc : Nc;
+            d[o] = col[0]; d[o + 1] = col[1]; d[o + 2] = col[2]; d[o + 3] = Math.round(Math.min(1, Math.pow(Math.abs(v), 0.75) * 1.25) * 255);
+          }
+        }
+        octx.putImageData(img, 0, 0);
+        ctx.imageSmoothingEnabled = true; ctx.drawImage(off, px0, by0, px1 - px0, by1 - by0);
+        const pps = (by1 - by0) / span, yNow = by0 + (t - tA) * pps;
+        ctx.fillStyle = C.grid; ctx.globalAlpha = 0.45; ctx.fillRect(px0, yNow, px1 - px0, by1 - yNow); ctx.globalAlpha = 1;
+        ctx.strokeStyle = C.grid2; ctx.lineWidth = 1; ctx.strokeRect(px0 + 0.5, by0 + 0.5, px1 - px0 - 1, by1 - by0 - 1);
+        const ts = [0.5, 1, 2, 5, 10].find(s => s * pps >= 24) || 10;
+        for (let tt = Math.ceil(tA / ts) * ts; tt <= tA + span + 1e-9; tt += ts) {
+          const y = by0 + (tt - tA) * pps;
+          if (y > by0 + 8) text(ctx, fmt(tt, ts < 1 ? 1 : 0), px0 - 6, y, C.muted, `12px ${BODY}`, 'right');
+          ctx.strokeStyle = C.grid2; ctx.beginPath(); ctx.moveTo(px0 - 3, y); ctx.lineTo(px0, y); ctx.stroke();
+        }
+        text(ctx, 't / s', px0 - 6, by0 - 9, C.ink, `italic 13px ${MATH}`, 'right');
+        ctx.setLineDash([2, 4]); ctx.strokeStyle = C.accent; ctx.lineWidth = 1.2;
+        ctx.beginPath(); ctx.moveTo(xPp, by0); ctx.lineTo(xPp, yNow); ctx.stroke(); ctx.setLineDash([]);
+        ctx.strokeStyle = C.accent; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(px0, yNow); ctx.lineTo(px1, yNow); ctx.stroke();
+        text(ctx, 'jetzt', px1 - 4, yNow - 9 > by0 + 6 ? yNow - 9 : yNow + 10, C.accent, `700 12px ${BODY}`, 'right');
+        text(ctx, 'Ort-Zeit-Bild', px0, by0 - 9, C.ink, `700 12px ${BODY}`, 'left');
+        let lx = px1;
+        ctx.font = `12px ${BODY}`;
+        for (const [s, c] of [['Tal', C.neg], ['Berg', C.pos]]) {
+          const tw = ctx.measureText(s).width;
+          text(ctx, s, lx, by0 - 9, C.muted, `12px ${BODY}`, 'right');
+          ctx.fillStyle = c; ctx.fillRect(lx - tw - 16, by0 - 14, 11, 10);
+          lx -= tw + 30;
+        }
+      } else {
+        const TX = tt => px0 + (tt - tA) / span * (px1 - px0);
+        const ym = (by0 + by1) / 2, hp = 0.42 * (by1 - by0), YP = p => ym - p / Aref * hp;
+        ctx.strokeStyle = C.grid2; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(px0, by0); ctx.lineTo(px0, by1); ctx.lineTo(px1, by1); ctx.stroke();
+        timeTicks(ctx, TX, tA, tA + span, (px1 - px0) / span, px0, px1, by0, by1);
+        ctx.strokeStyle = C.mark; ctx.beginPath(); ctx.moveTo(px0, ym); ctx.lineTo(px1, ym); ctx.stroke();
+        for (const v of [Aref, -Aref]) { ctx.strokeStyle = C.grid; ctx.beginPath(); ctx.moveTo(px0, YP(v)); ctx.lineTo(px1, YP(v)); ctx.stroke(); }
+        for (const v of [Aref, 0, -Aref]) text(ctx, fmt(v), px0 - 6, YP(v), C.muted, `12px ${BODY}`, 'right');
+        text(ctx, `Ψ am Punkt P (x = ${fmt(S.xP, 2)} m) / cm`, px0, by0 - 9, C.accent, `700 12px ${BODY}`, 'left');
+        const t1 = Math.min(t, tA + span), n = 420;
+        const curveP = (f, col, lw, dash = []) => {
+          ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.setLineDash(dash); ctx.beginPath();
+          for (let i = 0; i <= n; i++) { const tt = tA + (t1 - tA) * i / n, xx = TX(tt), yy = YP(f(tt)); i ? ctx.lineTo(xx, yy) : ctx.moveTo(xx, yy); }
+          ctx.stroke(); ctx.setLineDash([]);
+        };
+        ctx.save(); ctx.beginPath(); ctx.rect(px0 + 1, by0 - 4, px1 - px0, by1 - by0 + 4); ctx.clip();
+        if (S.show.comp && a.on && b.on) { curveP(tt => psi1(S.xP, tt), C.w1, 1.8, [6, 5]); curveP(tt => psi2(S.xP, tt), C.w2, 1.8, [6, 5]); }
+        curveP(tt => psi1(S.xP, tt) + psi2(S.xP, tt), C.accent, 3);
+        ctx.fillStyle = C.accent; ctx.beginPath(); ctx.arc(TX(t1), YP(psi1(S.xP, t1) + psi2(S.xP, t1)), 4.5, 0, TAU); ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    /* ---------- selector on the canvas ---------- */
+    gsel.innerHTML = [['xt', '<span class="m">x</span>–<span class="m">t</span>', 'Ort-Zeit-Bild'], ['pt', 'P(<span class="m">t</span>)', 'Bewegung des Punktes P über der Zeit']]
+      .map(([k, lab, tt]) => `<button type="button" role="radio" class="e" data-m="${k}" aria-checked="${S.mode === k}" title="${tt}" aria-label="${tt}">${lab}</button>`).join('');
+    gsel.addEventListener('click', e => {
+      const b = e.target.closest('[data-m]'); if (!b) return;
+      S.mode = b.dataset.m;
+      gsel.querySelectorAll('[data-m]').forEach(x => x.setAttribute('aria-checked', String(x === b)));
+      S.dirty = true;
+    });
+
+    /* ---------- drag P on the rope, or jump in time in the picture below ---------- */
+    let drag = null, tA0 = 0;
+    const pos = e => { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+    const where = (px, py) => {
+      const g = S.geo; if (!g || px < g.px0 - 12 || px > g.px1 + 12) return null;
+      if (py >= g.ry0 + 14 && py <= g.ry1 + 14) return 'P';
+      if (py >= g.by0 - 2 && py <= g.by1 + 2) return 'T';
+      return null;
+    };
+    function move(px, py) {
+      const g = S.geo;
+      if (drag === 'P') { S.xP = clamp(Math.round((px - g.px0) / (g.px1 - g.px0) * L * 20) / 20, 0, L); $('#w-xP').value = S.xP; ui(true); }
+      else {
+        const f = S.mode === 'xt' ? (py - g.by0) / (g.by1 - g.by0) : (px - g.px0) / (g.px1 - g.px0);
+        S.t = clamp(tA0 + clamp(f, 0, 1) * S.tView, 0, tMax());
+        if (S.run) { S.run = false; syncPlay('w'); }
+        ui(false);
+      }
+      S.dirty = true;
+    }
+    cv.addEventListener('pointerdown', e => {
+      const [px, py] = pos(e), k = where(px, py); if (!k) return;
+      drag = k; tA0 = S.geo.tA;
+      try { cv.setPointerCapture(e.pointerId); } catch (_) { /* ignore */ }
+      move(px, py);
+    });
+    cv.addEventListener('pointermove', e => {
+      const [px, py] = pos(e);
+      if (drag) { move(px, py); return; }
+      const k = where(px, py);
+      cv.style.cursor = k === 'P' ? 'ew-resize' : k === 'T' ? (S.mode === 'xt' ? 'ns-resize' : 'ew-resize') : '';
+    });
+    const end = () => { drag = null; };
+    cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
+
+    /* ---------- panel ---------- */
+    let lastKey = '';
+    function ui(force) {
+      const sl = $('#w-t'), mx = tMax();
+      if (Math.abs(+sl.max - mx) > 1e-6) sl.max = mx.toFixed(2);
+      if (S.run || document.activeElement !== sl) sl.value = S.t;
+      $('#w-tOut').textContent = fmt(S.t, 2) + ' s';
+      const p1 = psi1(S.xP, S.t), p2 = psi2(S.xP, S.t);
+      setHTML($('#w-num'), tableRows([
+        ['Zeit <span class="m">t</span>', 's', fmt(S.t, 2)],
+        ['Wellengeschwindigkeit <span class="m">c</span>', 'm/s', fmt(S.c, 1)],
+        ['Ort von <span class="m">P</span>', 'm', fmt(S.xP, 2)],
+        ['<span class="t-acc">Auslenkung bei <span class="m">P</span></span>, <span class="m">Ψ = Ψ<sub>1</sub> + Ψ<sub>2</sub></span>', 'cm', fmt(p1 + p2, 1)],
+        ['<span class="t-w1">davon Welle 1</span>, <span class="m">Ψ<sub>1</sub></span>', 'cm', fmt(p1, 1)],
+        ['<span class="t-w2">davon Welle 2</span>, <span class="m">Ψ<sub>2</sub></span>', 'cm', fmt(p2, 1)],
+        ['Geschwindigkeit von <span class="m">P</span> (auf und ab)', 'cm/s', fmt(vel(S.xP, S.t), 0)],
+        ['Grösste Auslenkung auf dem Seil', 'cm', fmt(S.maxSum, 1)],
+      ]));
+      if (force) {
+        const cols = S.w.map(wv => {
+          if (!wv.on) return ['aus', '—', '—', '—', '—', '—', '—', '—'];
+          const isP = wv.form === 'puls', T = per(wv), D = dur(wv);
+          return [FORM[wv.form], fmt(wv.A), fmt(isP ? wv.b : wv.lam, 1), isP ? '—' : fmt(1 / T, 2), isP ? '—' : fmt(T, 2), isP ? '—' : fmt(TAU / T, 2), isP ? '—' : fmt(TAU / wv.lam, 2), isFinite(D) ? fmt(D, 2) : '∞'];
+        });
+        const labs = [['Form', ''], ['Amplitude <span class="m">A</span>', 'cm'], ['Breite <span class="m">b</span> bzw. Wellenlänge <span class="m">λ</span>', 'm'], ['Frequenz <span class="m">f = c/λ</span>', 'Hz'],
+          ['Periode <span class="m">T = λ/c</span>', 's'], ['Kreisfrequenz <span class="m">ω = 2π/T</span>', '1/s'], ['Wellenzahl <span class="m">k = 2π/λ</span>', '1/m'], ['Dauer an einem festen Ort', 's']];
+        setHTML($('#w-wtab'), labs.map(([l, u], i) => `<tr><th scope="row">${l}<span class="u">${u}</span></th><td${i === 0 ? ' class="txt"' : ''}>${cols[0][i]}</td><td${i === 0 ? ' class="txt"' : ''}>${cols[1][i]}</td></tr>`).join(''));
+        for (let i = 0; i < 2; i++) {
+          const wv = S.w[i], p = 'w' + (i + 1), isP = wv.form === 'puls';
+          $('#' + p + 'AOut').textContent = fmt(wv.A) + ' cm' + (isP && wv.A > 0 ? ', Berg' : isP && wv.A < 0 ? ', Tal' : '');
+          $('#' + p + 'LLab').innerHTML = isP ? `Breite <span class="m">b<sub>${i + 1}</sub></span>` : `Wellenlänge <span class="m">λ<sub>${i + 1}</sub></span>`;
+          $('#' + p + 'LOut').textContent = fmt(isP ? wv.b : wv.lam, 1) + ' m';
+          $('#' + p + 'nOut').textContent = String(wv.n);
+          $('#' + p + 'nRow').hidden = wv.form !== 'zug';
+          $('#' + p + 'info').innerHTML = !wv.on ? 'Ausgeschaltet.' : isP
+            ? `Ein einzelner ${wv.A >= 0 ? 'Berg' : 'Tal'} der Breite <span class="m">b</span>. An einem festen Ort dauert er <span class="m">b/c</span> = ${fmt(wv.b / S.c, 2)} s.`
+            : `<span class="m">f = c/λ</span> = ${fmt(S.c / wv.lam, 2)} Hz, <span class="m">T</span> = ${fmt(wv.lam / S.c, 2)} s, <span class="m">ω</span> = ${fmt(TAU * S.c / wv.lam, 2)} 1/s, <span class="m">k</span> = ${fmt(TAU / wv.lam, 2)} 1/m. ` + (wv.form === 'zug' ? `${wv.n} Wellenlänge${wv.n > 1 ? 'n' : ''} lang.` : 'Wird ohne Ende nachgeliefert.');
+        }
+        $('#w-cOut').textContent = fmt(S.c, 1) + ' m/s';
+        $('#w-xTOut').textContent = 'x = ' + fmt(S.xT, 1) + ' m';
+        $('#w-xPOut').textContent = 'x = ' + fmt(S.xP, 2) + ' m';
+        $$('[data-wp]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.wp === S.preset)));
+        writeEq();
+      }
+      explain();
+    }
+
+    function explain() {
+      const st = status(), [a, b] = S.w, ended = S.t >= S.tEnd - 1e-6;
+      const pill = S.run ? 'Läuft' : ended ? 'Ende' : 'Pause', ps = S.run ? 'on' : 'end';
+      const same = a.form === b.form && a.A === b.A && (a.form === 'puls' ? a.b === b.b : a.lam === b.lam && (a.form !== 'zug' || a.n === b.n));
+      let title, txt;
+      if (!a.on && !b.on) { title = 'Keine Welle eingeschaltet'; txt = 'Schalte unten Welle 1 oder Welle 2 ein.'; }
+      else if (!(a.on && b.on)) {
+        const k = a.on ? 1 : 2, wv = a.on ? a : b;
+        title = 'Eine Welle allein';
+        txt = `Welle ${k} läuft mit <span class="m">c</span> = ${fmt(S.c, 1)} m/s nach ${k === 1 ? 'rechts' : 'links'}. Die Form wandert, das Seil selbst nicht: Jedes Stück bewegt sich nur auf und ab. Schau dir den Punkt <span class="m">P</span> an.` +
+          (wv.form !== 'puls' ? ` Er schwingt harmonisch mit der Periode <span class="m">T = λ/c</span> = ${fmt(per(wv), 2)} s.` : '');
+      } else if (ended || (!st.in1 && !st.in2 && st.passed)) {
+        title = 'Beide Wellen haben das Seil verlassen';
+        txt = 'Im Ort-Zeit-Bild unten siehst du den ganzen Ablauf: zwei schräge Streifen, die sich kreuzen und gerade weiterlaufen. Keine Welle wird abgelenkt oder gebremst. Ziehe die Zeit zurück oder starte neu.';
+      } else if (!st.met) {
+        title = 'Zwei Wellen laufen aufeinander zu';
+        txt = `Welle 1 läuft nach rechts, Welle 2 nach links, beide mit <span class="m">c</span> = ${fmt(S.c, 1)} m/s. Die Geschwindigkeit hängt nur vom Seil ab, nicht von Form oder Grösse der Welle. Die Wellenfronten treffen sich bei <span class="m">x</span> = ${fmt(S.xT, 1)} m.`;
+      } else if (st.overlap) {
+        if (a.form === 'dauer' && b.form === 'dauer') {
+          if (a.lam === b.lam && Math.abs(a.A) === Math.abs(b.A)) {
+            title = 'Stehende Welle';
+            txt = `Wo sich die beiden Dauerwellen überlagern, wandert nichts mehr. Manche Punkte sind immer in Ruhe (Knoten), sie liegen <span class="m">λ/2</span> = ${fmt(a.lam / 2, 2)} m auseinander. Dazwischen schwingt das Seil mit bis zu doppelter Amplitude. Schiebe <span class="m">P</span> auf einen Knoten.`;
+          } else {
+            title = 'Zwei Dauerwellen überlagern sich';
+            txt = 'Die Wellen haben verschiedene Wellenlängen oder Amplituden. Das Muster aus ihrer Summe verändert sich ständig, es gibt keine festen Knoten. Mit gleicher Wellenlänge und Amplitude entsteht eine stehende Welle.';
+          }
+        } else {
+          title = 'Überlagerung: Die Auslenkungen addieren sich';
+          txt = 'Wo beide Wellen gleichzeitig sind, ist die Auslenkung des Seils die Summe <span class="m">Ψ = Ψ<sub>1</sub> + Ψ<sub>2</sub></span>. Gestrichelt siehst du die beiden einzelnen Wellen.';
+          if (a.form === 'puls' && b.form === 'puls') {
+            const mx = Math.max(Math.abs(a.A), Math.abs(b.A));
+            if (a.A * b.A > 0) txt += ' Zwei Berge ergeben kurz einen höheren Berg, höchstens <span class="m">A<sub>1</sub> + A<sub>2</sub></span>.';
+            else if (a.A * b.A < 0) txt += ' Berg und Tal heben sich teilweise auf.';
+            if (a.A * b.A < 0 && S.maxSum < 0.12 * mx) txt += ' Gerade ist das Seil fast flach. Die Energie ist trotzdem nicht weg: Die Seilstücke bewegen sich schnell auf und ab. Schalte „Geschwindigkeit der Seilstücke“ ein.';
+          }
+        }
+      } else if (st.passed) {
+        title = 'Nach der Begegnung: Beide laufen unverändert weiter';
+        txt = 'Welle 1 läuft weiter nach rechts, Welle 2 nach links. Beide haben genau ihre alte Form. Die Wellen stossen sich nicht ab und stören sich nicht, sie laufen durcheinander hindurch.' +
+          (same ? ' Bei zwei gleichen Wellen sieht man nicht, ob sie durchlaufen oder abprallen. Probiere „Verschiedene Pulse“.' : ' Du erkennst sie an Grösse und Form wieder.');
+      } else {
+        title = 'Die Wellen begegnen sich';
+        txt = 'Wo beide Wellen sind, addieren sich die Auslenkungen.';
+      }
+      const key = pill + title + txt;
+      if (key === lastKey) return;
+      lastKey = key;
+      const pe = $('#w-pill'); pe.textContent = pill; pe.dataset.state = ps;
+      $('#w-eTitle').textContent = title; $('#w-eText').innerHTML = txt;
+    }
+
+    function writeEq() {
+      const hw = S.w.find(wv => wv.on && wv.form !== 'puls');
+      const vals = hw
+        ? `Mit den Einstellungen (Welle ${S.w.indexOf(hw) + 1}): <span class="m">λ</span> = ${fmt(hw.lam, 1)} m, <span class="m">c</span> = ${fmt(S.c, 1)} m/s, also <span class="m">f = c/λ</span> = ${fmt(S.c / hw.lam, 2)} Hz, <span class="m">T</span> = ${fmt(hw.lam / S.c, 2)} s, <span class="m">ω</span> = ${fmt(TAU * S.c / hw.lam, 2)} 1/s, <span class="m">k</span> = ${fmt(TAU / hw.lam, 2)} 1/m.`
+        : `Mit den Einstellungen: <span class="m">c</span> = ${fmt(S.c, 1)} m/s. Für <span class="m">λ</span>, <span class="m">f</span>, <span class="m">ω</span> und <span class="m">k</span> wähle einen Wellenzug oder eine Dauerwelle.`;
+      const h = '<p class="note"><b>Welle</b> = räumliche Ausbreitung einer Störung. Die Wellenfunktion <span class="m">Ψ(x, t)</span> gibt die Auslenkung am Ort <span class="m">x</span> zur Zeit <span class="m">t</span>. Ein „Foto“ zum Zeitpunkt <span class="m">t</span> zeigt <span class="m">Ψ</span> über <span class="m">x</span>.</p>' +
+        eqs(['Ψ<sub>1</sub> = f(x − c t)', 'läuft nach rechts'], ['Ψ<sub>2</sub> = g(x + c t)', 'läuft nach links']) +
+        eqs(['Ψ = Ψ<sub>1</sub> + Ψ<sub>2</sub>', 'Überlagerung (Superposition)']) +
+        eqs(['Ψ(x, t) = A cos(k x − ω t − φ<sub>0</sub>)', 'harmonische Welle']) +
+        eqs(['ω = 2π / T', 'Kreisfrequenz: beschreibt die Schwingung'], ['k = 2π / λ', 'Wellenzahl: beschreibt die Ausbreitung']) +
+        eqs(['c = ω / k = λ f', 'Wellengeschwindigkeit']) +
+        `<p class="optnote">${vals}</p>` +
+        eqs(['A cos(kx − ωt) + A cos(kx + ωt) = 2A cos(kx) cos(ωt)', 'stehende Welle']) +
+        '<p class="note">Einzelne Punkte auf der Welle schwingen harmonisch auf und ab, mit derselben Kreisfrequenz <span class="m">ω</span>. Die Welle transportiert Energie, aber kein Material.</p>';
+      setHTML($('#w-eq'), h);
+    }
+
+    function writeTheory() {
+      const h = `<section class="group" style="border-top:0;padding-top:0" aria-labelledby="w-h-d1"><h3 id="w-h-d1">Warum Wellen einfach durcheinander hindurchlaufen</h3>` +
+        stepBox(1, `<p><b>Eine Form, die wandert.</b> Nimm eine beliebige Form <span class="m">f</span>, zum Beispiel einen Puls. Die Funktion</p>${eqn('Ψ(x, t) = f(x − c t)')}<p>hat zur Zeit <span class="m">t</span> dieselbe Form wie bei <span class="m">t = 0</span>, nur um <span class="m">c t</span> nach rechts verschoben. Sie beschreibt eine Welle, die mit <span class="m">c</span> nach rechts läuft. Ebenso läuft <span class="m">g(x + c t)</span> nach links.</p>`) +
+        stepBox(2, `<p><b>Die Wellengleichung.</b> Mit der Kettenregel gilt für <span class="m">Ψ = f(x − c t)</span>: zweimal nach <span class="m">t</span> abgeleitet gibt <span class="m">c² f″</span>, zweimal nach <span class="m">x</span> gibt <span class="m">f″</span>. Also</p>${eqn('∂²Ψ/∂t² = c² ∂²Ψ/∂x²', 'Wellengleichung')}<p>Links steht die Beschleunigung eines Seilstücks, rechts die Krümmung des Seils. Wo das Seil stark gekrümmt ist, ziehen die Nachbarn kräftig. Für ein Seil ist <span class="m">c = √(F/μ)</span>, mit der Seilkraft <span class="m">F</span> und der Masse pro Länge <span class="m">μ</span>.</p>`) +
+        stepBox(3, `<p><b>Überlagerung.</b> Die Gleichung ist linear: Sind <span class="m">Ψ<sub>1</sub></span> und <span class="m">Ψ<sub>2</sub></span> Lösungen, dann auch ihre Summe.</p>${eqn('Ψ(x, t) = f(x − c t) + g(x + c t)')}<p>Diese Formel gilt vor, während und nach der Begegnung. Jeder Summand läuft weiter, als wäre der andere nicht da. Darum kommen beide Wellen nach dem Treffen mit ihrer alten Form heraus. Im Ort-Zeit-Bild sind das zwei gerade Streifen, die sich kreuzen.</p>`) +
+        stepBox(4, `<p><b>Harmonische Welle.</b> Ist die Form ein Cosinus, <span class="m">f(u) = A cos(k u)</span>, dann wird</p>${eqn('Ψ(x, t) = A cos(k x − ω t)', 'mit ω = c k')}<p>Halte den Ort fest, <span class="m">x = x<sub>P</sub></span>: <span class="m">Ψ(x<sub>P</sub>, t) = A cos(ω t − k x<sub>P</sub>)</span> ist eine harmonische Schwingung mit derselben Kreisfrequenz <span class="m">ω</span>. Halte die Zeit fest: Dann ist es ein Cosinus im Raum mit der Wellenlänge <span class="m">λ = 2π/k</span>. Daraus folgt <span class="m">c = ω/k = λ f</span>.</p>`) +
+        stepBox(5, `<p><b>Stehende Welle.</b> Zwei gleiche harmonische Wellen in entgegengesetzter Richtung:</p>${eqn('A cos(kx − ωt) + A cos(kx + ωt) = 2A cos(kx) cos(ωt)')}<p>Ort und Zeit stehen jetzt in getrennten Faktoren. Wo <span class="m">cos(kx) = 0</span> ist, bleibt das Seil immer in Ruhe (Knoten). Die Knoten liegen <span class="m">λ/2</span> auseinander, dazwischen schwingt alles im Gleichtakt mit bis zu <span class="m">2A</span>.</p>`) +
+        stepBox(6, `<p><b>Wo ist die Energie bei „Berg und Tal“?</b> Decken sich Berg und Tal genau, ist <span class="m">Ψ = 0</span>, das Seil ist flach. Die Geschwindigkeiten der Seilstücke heben sich aber nicht auf, sie addieren sich: <span class="m">∂Ψ/∂t</span> ist dort doppelt so gross wie bei einer Welle allein. In diesem Moment ist die ganze Energie Bewegungsenergie. Bei „Zwei Berge“ ist es umgekehrt: Bei voller Überdeckung stehen die Seilstücke kurz still, und die Energie steckt ganz in der Dehnung des Seils.</p>`) +
+        '</section>';
+      $('#w-dglBox').innerHTML = h;
+    }
+
+    function writeTry() {
+      const T = [
+        ['Folie, Frage d): Die Kreisfrequenzen der harmonischen Welle und beim harmonischen Oszillator sind unterschiedliche Grössen und sollten nicht verwechselt werden. Stimmt das?', 'Nein. Bei einer harmonischen Welle ist <span class="m">ω</span> genau die Kreisfrequenz, mit der die einzelnen Punkte schwingen. Probiere es: Welle 1 als Dauerwelle, Welle 2 aus, unten „P(t)“ wählen. <span class="m">P</span> schwingt harmonisch mit <span class="m">T = λ/c</span>, also mit <span class="m">ω = 2π/T</span> aus der Tabelle.'],
+        ['Prallen zwei Pulse voneinander ab, oder laufen sie durcheinander hindurch?', 'Sie laufen hindurch. Bei zwei gleichen Pulsen sieht beides gleich aus. Mit „Verschiedene Pulse“ sieht man es: Der hohe, schmale Puls kommt rechts wieder heraus, der flache, breite links. Im Ort-Zeit-Bild laufen beide Streifen gerade weiter.'],
+        ['„Berg und Tal“: Im Moment der Begegnung ist das Seil flach. Wo ist die Energie?', 'In der Bewegung. Pausiere, wenn das Seil flach ist, und schalte „Geschwindigkeit der Seilstücke“ ein: Die Pfeile sind dort besonders lang. Darum kann das Seil die beiden Pulse danach wieder hergeben.'],
+        ['„Zwei Berge“: Wie hoch wird der Berg, wenn sich beide decken? Wie schnell bewegen sich die Seilstücke dann?', 'Doppelt so hoch, <span class="m">A<sub>1</sub> + A<sub>2</sub></span> = 28 cm. In genau diesem Moment stehen die Seilstücke in der Mitte still, weil sich ihre Geschwindigkeiten aufheben. Die Energie steckt dann ganz in der Verformung des Seils.'],
+        ['Läuft der Punkt <span class="m">P</span> mit der Welle mit?', 'Nein, er bewegt sich nur auf und ab. Schalte „Seilstücke“ ein: Alle Punkte bleiben an ihrem Ort <span class="m">x</span>. Was wandert, ist die Form und mit ihr die Energie, nicht das Seil.'],
+        ['Halbiere bei einem Wellenzug die Wellenlänge. Was passiert mit der Frequenz?', 'Sie verdoppelt sich, denn <span class="m">c = λ f</span> und <span class="m">c</span> ist durch das Seil fest. Im Ort-Zeit-Bild liegen die Streifen doppelt so dicht.'],
+        ['Erhöhe die Wellengeschwindigkeit <span class="m">c</span> (ein stärker gespanntes Seil). Wie ändert sich das Ort-Zeit-Bild?', 'Die Streifen werden flacher: In derselben Zeit legt die Welle einen längeren Weg zurück. Die Steigung der Streifen ist <span class="m">1/c</span>.'],
+        ['„Stehende Welle“: Schiebe <span class="m">P</span> auf <span class="m">x</span> = 2.5 m oder 4.5 m. Was macht er?', 'Nichts, er bleibt in Ruhe. Dort liegt ein Knoten. Die Knoten liegen <span class="m">λ/2</span> = 1 m auseinander, im Ort-Zeit-Bild sind sie senkrechte Linien ohne Farbe. Bei 2 m, 3 m, 4 m schwingt <span class="m">P</span> am stärksten, mit <span class="m">2A</span>.'],
+      ];
+      $('#w-try').innerHTML = detailsList(T);
+      $('#w-foot').innerHTML = 'Das Seil ist länger als gezeigt: Die Wellen kommen von aussen herein und laufen am anderen Rand hinaus, ohne reflektiert zu werden. Beide Wellen haben dieselbe Geschwindigkeit <span class="m">c</span>, weil sie auf demselben Seil laufen. Die Auslenkung ist stark überhöht gezeichnet. <span class="m">Ψ</span> wird exakt berechnet, nicht simuliert: <span class="m">Ψ<sub>1</sub></span> hängt nur von <span class="m">x − c t</span> ab, <span class="m">Ψ<sub>2</sub></span> nur von <span class="m">x + c t</span>.';
+    }
+
+    /* ---------- inputs ---------- */
+    function syncCtrls() {
+      for (let i = 0; i < 2; i++) {
+        const wv = S.w[i], p = 'w' + (i + 1);
+        $('#' + p + 'on').checked = wv.on;
+        $$(`input[name="${p}form"]`).forEach(r => { r.checked = r.value === wv.form; });
+        $('#' + p + 'A').value = wv.A;
+        $('#' + p + 'L').value = wv.form === 'puls' ? wv.b : wv.lam;
+        $('#' + p + 'n').value = wv.n;
+      }
+      $('#w-c').value = S.c; $('#w-xT').value = S.xT; $('#w-xP').value = S.xP;
+    }
+    function changed() { S.preset = null; sched(); S.dirty = true; ui(true); }
+    for (let i = 0; i < 2; i++) {
+      const p = 'w' + (i + 1), wv = () => S.w[i];
+      $('#' + p + 'on').addEventListener('change', e => { wv().on = e.target.checked; changed(); });
+      $$(`input[name="${p}form"]`).forEach(r => r.addEventListener('change', () => { wv().form = r.value; $('#' + p + 'L').value = r.value === 'puls' ? wv().b : wv().lam; changed(); }));
+      $('#' + p + 'A').addEventListener('input', e => { wv().A = +e.target.value; changed(); });
+      $('#' + p + 'L').addEventListener('input', e => { if (wv().form === 'puls') wv().b = +e.target.value; else wv().lam = +e.target.value; changed(); });
+      $('#' + p + 'n').addEventListener('input', e => { wv().n = +e.target.value; changed(); });
+    }
+    $('#w-c').addEventListener('input', e => { S.c = +e.target.value; changed(); });
+    $('#w-xT').addEventListener('input', e => { S.xT = +e.target.value; changed(); });
+    $('#w-xP').addEventListener('input', e => { S.xP = +e.target.value; S.dirty = true; ui(true); });
+    $$('[data-wp]').forEach(btn => btn.addEventListener('click', () => {
+      const P = PRESETS[btn.dataset.wp];
+      P.forEach((p, i) => Object.assign(S.w[i], { on: true }, p));
+      S.c = 2; S.xT = 4; S.t = 0; S.preset = btn.dataset.wp;
+      sched(); syncCtrls();
+      S.run = !REDUCED; syncPlay('w'); S.dirty = true; ui(true);
+    }));
+    $('#w-t').addEventListener('input', e => {
+      S.t = clamp(+e.target.value, 0, tMax());
+      if (S.run) { S.run = false; syncPlay('w'); }
+      S.dirty = true; ui(false);
+    });
+    const nudge = dt => { S.t = clamp(Math.round((S.t + dt) * 100) / 100, 0, tMax()); if (S.run) { S.run = false; syncPlay('w'); } S.dirty = true; ui(false); };
+    $('#w-back').addEventListener('click', () => nudge(-0.05));
+    $('#w-fwd').addEventListener('click', () => nudge(0.05));
+    $$('input[name="w-tempo"]').forEach(r => r.addEventListener('change', () => { S.tempo = +r.value; }));
+    [['w-comp', 'comp'], ['w-beads', 'beads'], ['w-vel', 'vel']].forEach(([id, k]) => $('#' + id).addEventListener('change', e => { S.show[k] = e.target.checked; S.dirty = true; }));
+
+    writeTry(); writeTheory(); syncCtrls();
+    // pressing play at the end starts again from the beginning
+    const onPlay = () => { if (S.t >= S.tEnd - 1e-6) S.t = 0; };
+    return { S, draw, step, ui, reset, onPlay, init: () => { sched(); ui(true); } };
+  })();
+
+  /* =====================================================================
+     Seiten, Steuerung, Vollbild, QR-Code
+     ===================================================================== */
+  const HASH = { gedaempft: 'd', erzwungen: 'f', wellen: 'w' }, NAME = { d: 'gedaempft', f: 'erzwungen', w: 'wellen' };
+  const HEAD = {
+    d: ['Gedämpfte Schwingung', 'Eine Masse an einer Feder taucht in eine zähe Flüssigkeit. Die Reibung bremst sie: Je nach Stärke der Dämpfung schwingt sie aus, kehrt direkt zurück oder kriecht.'],
+    f: ['Erzwungene Schwingung', 'Ein Rad bewegt den Aufhängepunkt der Feder mit der Frequenz Ω auf und ab. Stelle Ω ein und finde die Resonanz.'],
+    w: ['Wellen', 'Zwei Wellen laufen auf einem langen Seil aufeinander zu. Wo sie sich treffen, addieren sich die Auslenkungen. Danach laufen beide unverändert weiter.'],
+  };
+  const qr = $('#qr'), qrUrl = $('#qrUrl');
+  let cur = 'd', last = performance.now(), lastUI = 0;
+  function show(k) {
+    if (!PG[k]) k = 'd';
+    cur = k;
+    $$('main.layout').forEach(m => { m.hidden = m.dataset.pg !== k; });
+    $$('.pages a').forEach(a => { if (a.dataset.page === k) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+    $('#h1').textContent = HEAD[k][0]; $('#lead').textContent = HEAD[k][1];
+    exitFs();
+    PG[k].S.dirty = true; PG[k].ui(true); resetSteady();
+    last = performance.now();
+    if (!qr.hidden) renderQR();
+  }
+  const route = () => show(HASH[location.hash.slice(1)] || 'd');
+  addEventListener('hashchange', route);
+  $$('.pages a').forEach(a => a.addEventListener('click', () => show(a.dataset.page)));
+
+  $$('.frames[role="tablist"]').forEach(fr => fr.addEventListener('click', e => {
+    const b = e.target.closest('[data-tab]'); if (!b) return;
+    fr.querySelectorAll('[data-tab]').forEach(x => { const on = x === b; x.setAttribute('aria-selected', String(on)); $('#' + x.dataset.tab).hidden = !on; });
+  }));
+  $$('.playBtn').forEach(b => b.addEventListener('click', () => {
+    const k = b.dataset.p, p = PG[k];
+    if (!p.S.run && p.onPlay) p.onPlay();
+    p.S.run = !p.S.run; syncPlay(k); p.S.dirty = true; p.ui(false);
+  }));
+  $$('.resetBtn').forEach(b => b.addEventListener('click', () => PG[b.dataset.p].reset()));
+
+  /* ---------- full screen ---------- */
+  let fsWrap = null;
+  function setFsIcons() {
+    $$('.fullBtn').forEach(b => {
+      const on = !!fsWrap && b.closest('.stagewrap') === fsWrap;
+      b.querySelector('.i-full').toggleAttribute('hidden', on); b.querySelector('.i-exit').toggleAttribute('hidden', !on);
+      b.title = on ? 'Vollbild beenden' : 'Vollbild'; b.setAttribute('aria-label', b.title);
+    });
+    document.body.classList.toggle('fs-open', !!fsWrap && fsWrap.classList.contains('fs'));
+    if (PG[cur]) PG[cur].S.dirty = true;
+  }
+  function exitFs() {
+    if (!fsWrap) return;
+    if (document.fullscreenElement || document.webkitFullscreenElement) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    fsWrap.classList.remove('fs'); fsWrap = null; setFsIcons();
+  }
+  $$('.fullBtn').forEach(btn => btn.addEventListener('click', () => {
+    const wrap = btn.closest('.stagewrap');
+    if (fsWrap) { exitFs(); return; }
+    fsWrap = wrap;
+    const req = wrap.requestFullscreen || wrap.webkitRequestFullscreen;
+    const fallback = () => { wrap.classList.add('fs'); setFsIcons(); };
+    if (req) { try { const r = req.call(wrap); if (r && r.catch) r.catch(fallback); } catch (e) { fallback(); } } else fallback();
+    setFsIcons();
+  }));
+  const fsChange = () => { if (!document.fullscreenElement && !document.webkitFullscreenElement && fsWrap && !fsWrap.classList.contains('fs')) fsWrap = null; setFsIcons(); };
+  document.addEventListener('fullscreenchange', fsChange); document.addEventListener('webkitfullscreenchange', fsChange);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && fsWrap && fsWrap.classList.contains('fs')) exitFs(); });
+
+  /* ---------- the explanation boxes only grow, so nothing below them jumps ---------- */
+  const steady = new Map();
+  function resetSteady() { for (const el of $$('.explain')) { el.style.minHeight = ''; steady.set(el, 0); } }
+  const mo = new MutationObserver(list => {
+    for (const m of list) {
+      const el = (m.target.closest ? m.target : m.target.parentElement).closest('.explain');
+      if (!el) continue;
+      const hh = el.offsetHeight;
+      if (hh > (steady.get(el) || 0)) { steady.set(el, hh); el.style.minHeight = hh + 'px'; }
+    }
+  });
+  $$('.explain').forEach(el => mo.observe(el, { childList: true, subtree: true, characterData: true }));
+  let lastW = innerWidth;
+  addEventListener('resize', () => { if (innerWidth !== lastW) { lastW = innerWidth; resetSteady(); } });
+
+  /* ---------- QR code: opens the same page on a phone ---------- */
+  let qrOpener = null;
+  function defaultUrl() {
+    let framed = true;
+    try { framed = window.top !== window.self; } catch (e) { /* cross-origin frame */ }
+    if (!framed && /^https?:$/.test(location.protocol)) return location.href.split('#')[0];
+    try { const v = localStorage.getItem('uebung11-qr-url'); if (v) return v; } catch (e) { /* storage blocked */ }
+    return SHARE_URL;
+  }
+  function renderQR() {
+    const box = $('#qrCode'), base = qrUrl.value.trim().split('#')[0], url = base ? base + '#' + NAME[cur] : '';
+    box.textContent = '';
+    $('#qrUrlText').textContent = url;
+    const msg = t => { const p = document.createElement('p'); p.textContent = t; box.append(p); };
+    if (!url) { msg('Gib unten die Adresse ein, unter der diese Seite erreichbar ist.'); return; }
+    if (typeof qrcode !== 'function') { msg('Der QR-Generator konnte nicht geladen werden. Prüfe die Internetverbindung und öffne das Fenster erneut.'); return; }
+    let q;
+    try { q = qrcode(0, 'M'); q.addData(url); q.make(); } catch (e) { msg('Diese Adresse ist zu lang für einen QR-Code.'); return; }
+    const n = q.getModuleCount(), quiet = 3, cells = n + 2 * quiet, px = Math.max(4, Math.floor(720 / cells));
+    const c = document.createElement('canvas');
+    c.width = c.height = cells * px;
+    c.setAttribute('role', 'img'); c.setAttribute('aria-label', 'QR-Code für ' + url);
+    const g = c.getContext('2d'), cs = getComputedStyle(document.documentElement);
+    g.fillStyle = cs.getPropertyValue('--qr-bg').trim(); g.fillRect(0, 0, c.width, c.height);
+    g.fillStyle = cs.getPropertyValue('--qr-ink').trim();
+    for (let r = 0; r < n; r++) for (let k = 0; k < n; k++) if (q.isDark(r, k)) g.fillRect((k + quiet) * px, (r + quiet) * px, px, px);
+    box.append(c);
+  }
+  function openQR() {
+    qrOpener = document.activeElement;
+    if (!qrUrl.value) qrUrl.value = defaultUrl();
+    qr.hidden = false; renderQR();
+    if (typeof qrcode !== 'function') setTimeout(renderQR, 1200);
+    $('#qrClose').focus();
+  }
+  function closeQR() { qr.hidden = true; if (qrOpener) qrOpener.focus(); }
+  $('#qrBtn').addEventListener('click', openQR);
+  $('#qrClose').addEventListener('click', closeQR);
+  qr.addEventListener('click', e => { if (e.target === qr) closeQR(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !qr.hidden) closeQR(); });
+  qrUrl.addEventListener('input', () => { renderQR(); try { localStorage.setItem('uebung11-qr-url', qrUrl.value.trim()); } catch (e) { /* storage blocked */ } });
+
+  /* ---------- start ---------- */
+  readColors();
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readColors);
+  new MutationObserver(readColors).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'class'] });
+  const allDirty = () => { for (const p of Object.values(PG)) p.S.dirty = true; };
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(allDirty);
+  const ro = new ResizeObserver(allDirty);
+  ro.observe(document.body); $$('canvas.c3').forEach(c => ro.observe(c));
+  for (const k of Object.keys(PG)) { if (REDUCED) PG[k].S.run = false; PG[k].init(); syncPlay(k); }
+  route();
+
+  function loop(now) {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    const p = PG[cur];
+    if (p.S.run) p.step(dt * p.S.tempo);
+    if (p.S.dirty) { p.draw(); p.S.dirty = false; }
+    if (now - lastUI > 120) { p.ui(false); lastUI = now; }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
