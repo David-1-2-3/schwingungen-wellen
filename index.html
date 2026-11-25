@@ -258,6 +258,34 @@ canvas.tall { aspect-ratio: 16 / 11; max-height: calc(100vh - 40px); touch-actio
 .stagewrap.fs .viewbtns { top: calc(env(safe-area-inset-top, 0px) + 10px); right: calc(env(safe-area-inset-right, 0px) + 10px); }
 .stagewrap.fs .ctrls { top: calc(env(safe-area-inset-top, 0px) + 6px); left: calc(env(safe-area-inset-left, 0px) + 12px); }
 body.fs-open { overflow: hidden; }
+/* in full screen: two side panels, one for what is shown and one for the settings. They hold the same controls as the page,
+   moved over while full screen lasts. On wide screens the animation gets narrower, on narrow ones the panel lies on top. */
+.viewbtns { z-index: 3; }
+.ctrls { z-index: 3; }
+.tbtn { appearance: none; height: 40px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  font: inherit; font-size: 14px; font-weight: 700; padding: 0 14px 0 11px; display: inline-flex; align-items: center; gap: 7px; cursor: pointer;
+  box-shadow: 0 4px 14px -6px var(--shadow); white-space: nowrap; }
+.tbtn svg { width: 18px; height: 18px; flex: none; }
+.tbtn:hover { border-color: var(--accent); }
+.tbtn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+.tbtn:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.stagewrap { --fsw: min(400px, 36vw); }
+.fsside { position: absolute; top: 0; right: 0; bottom: 0; z-index: 2; width: var(--fsw); overflow-y: auto; overscroll-behavior: contain;
+  background: var(--bg); border-left: 1px solid var(--line);
+  padding: 64px calc(18px + env(safe-area-inset-right, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)) 18px; display: grid; align-content: start; gap: 22px; }
+.fsp { display: grid; gap: 14px; min-width: 0; }
+.fsp > h2 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 21px; line-height: 1.15; }
+.fsp > h2 + .group { border-top: 0; padding-top: 0; }
+/* the display panel keeps only the switches: its heading says the same, the long note is on the page */
+.fsp[data-fsp="show"] .group > h3, .fsp[data-fsp="show"] .note { display: none; }
+.stagewrap.fsOn.side { padding-right: var(--fsw); }
+@media (max-width: 699px) {
+  .stagewrap.fsOn.side { padding-right: 0; }
+  .fsside { width: min(100%, 360px); box-shadow: -12px 0 32px -12px var(--shadow); }
+  .tbtn { width: 40px; padding: 0; justify-content: center; }
+  .tbtn .tl { display: none; }
+  .stagewrap.fsOn:not(.side) .viewbtns { flex-direction: column; align-items: flex-end; }
+}
 
 /* time derivatives: a dot (or two) above the letter */
 .dt, .dt2 { position: relative; display: inline-block; }
@@ -393,8 +421,9 @@ body.fs-open { overflow: hidden; }
             <label class="chip"><input type="checkbox" id="d-pen" checked><span class="lbl">Masse schreibt die Kurve</span></label>
             <label class="chip"><input type="checkbox" id="d-sol" checked><span class="lbl">Formel-Lösung</span></label>
             <label class="chip"><input type="checkbox" id="d-env" checked><span class="lbl">Einhüllende <span class="m">e<sup>−δt</sup></span></span></label>
-            <label class="chip"><input type="checkbox" id="d-F" checked><span class="lbl">Kräfte</span></label>
-            <label class="chip"><input type="checkbox" id="d-V" checked><span class="lbl">Geschwindigkeit</span></label>
+            <label class="chip"><input type="checkbox" id="d-F" checked><span class="lbl">Kräfte <span class="m">F<sub>D</sub></span> und <span class="m">F<sub>W</sub></span></span></label>
+            <label class="chip"><input type="checkbox" id="d-R" checked><span class="lbl">Gesamtkraft <span class="m">F<sub>res</sub> = m a</span></span></label>
+            <label class="chip"><input type="checkbox" id="d-V"><span class="lbl">Geschwindigkeit</span></label>
           </div>
           <p class="note" id="d-showNote"></p>
         </section>
@@ -731,6 +760,12 @@ body.fs-open { overflow: hidden; }
     headPath(); ctx.fill();
     return true;
   }
+  // right end of the free space in the band at the top of a canvas: left of the round buttons (more of them in full screen)
+  function freeRight(cv, w) {
+    const vb = cv.parentElement.querySelector('.viewbtns');
+    if (!vb || !vb.offsetWidth) return w - 56;
+    return Math.min(w - 56, vb.getBoundingClientRect().left - cv.getBoundingClientRect().left - 10);
+  }
   function text(ctx, s, x, y, col, font, align = 'center', base = 'middle') {
     ctx.save(); ctx.font = font; ctx.textAlign = align; ctx.textBaseline = base;
     ctx.lineJoin = 'round'; ctx.strokeStyle = C.halo; ctx.lineWidth = 4; ctx.strokeText(s, x, y);
@@ -813,7 +848,7 @@ body.fs-open { overflow: hidden; }
     const S = {
       p: { m: DEF.m, D: DEF.D, x0: DEF.x0, v0: DEF.v0, grav: DEF.grav }, zeta: DEF.zeta, delta: 0, tempo: 0.5, run: true, dirty: true,
       gs: { x: true, v: false, a: false, E: false },
-      show: { pen: true, sol: true, env: true, cmp: false, F: true, V: true },
+      show: { pen: true, sol: true, env: true, cmp: false, F: true, R: true, V: false },
       t: 0, y: 0, v: 0, y0: 0, vv0: 0, hist: [], cross: [], Tm: null, lastHist: -1, E0: 1, A0: 0.1, maxima: [],
     };
     const CMP = [{ z: 0.2, col: 'k1', lab: 'Schwingfall' }, { z: 1, col: 'k2', lab: 'Grenzfall' }, { z: 2, col: 'k3', lab: 'Kriechfall' }];
@@ -906,7 +941,7 @@ body.fs-open { overflow: hidden; }
       const hw = Math.min(bs * 1.35, cx - 6);
       drawTank(ctx, cx, yMid - half - bs / 2 - 14, yMid + half + bs / 2 + 10, hw, S.zeta);
       drawCeiling(ctx, cx, top0, aw * 0.3);
-      drawSpring(ctx, cx, top0, mY - bs / 2, clamp(aw * 0.09, 9, 16));
+      drawSpring(ctx, cx, top0, mY - bs / 2, Math.min(clamp(aw * 0.09, 9, 16), bs * 0.2));   // narrow, so the upward arrows pass beside it
       ctx.setLineDash([3, 4]); ctx.strokeStyle = C.equi; ctx.lineWidth = 1.4;
       ctx.beginPath(); ctx.moveTo(8, yMid); ctx.lineTo(S.gs.x ? gx1 : aw, yMid); ctx.stroke();
       const yr = yMid - shift() * kx, showR = S.p.grav && yr > top0 + 6;
@@ -915,18 +950,35 @@ body.fs-open { overflow: hidden; }
       text(ctx, 'x = 0', aw - 8, yMid - 9, C.muted, `italic 12px ${MATH}`, 'right');
       if (showR) text(ctx, 'entspannt', aw - 8, yr - 9, C.muted, `11px ${BODY}`, 'right');
       drawMass(ctx, cx, mY, bs);
-      const xr = cx + bs * 0.95;   // velocity and friction sit on the same line: they always point opposite ways
+      // F_D and F_W start at the upper or lower face of the mass, on the side they pull towards: F_D on the left, F_W on the right.
+      // Their sum, the resulting force, sits beside the mass. All three on one scale, each named just past its tip.
+      const xl = cx - bs * 0.4, xr = cx + bs * 0.4, xn = cx + bs / 2 + Math.max(12, bs * 0.45);
+      const face = l => mY + (l > 0 ? -bs / 2 : bs / 2);
+      const flab = (x, y0, l, sub, col) => {
+        ctx.font = `italic 15px ${MATH}`; let tw = ctx.measureText('F').width + 1;
+        ctx.font = `italic 10px ${MATH}`; tw += ctx.measureText(sub).width;
+        sym(ctx, x - tw / 2, y0 - l - (l > 0 ? 11 : -12), 'F', sub, col);
+      };
+      // as on the slide: F_D ~ −x and F_W ~ −ẋ. With gravity F_D is spring force plus weight:
+      // the weight only moves the rest position, so the part that changes is −D x. The sum is m a.
+      const FD = -S.p.D * S.y, FW = -bco() * S.v, FR = FD + FW;
+      // a force that is small but not zero still gets an arrow long enough to show its direction
+      // (in the creep case F_res is only a few percent of F_D)
+      const L = clamp(half * 0.75, 40, 100), kF = L / (S.p.D * S.A0);
+      const len = F => { const l = clamp(F * kF, -1.4 * L, 1.4 * L); return Math.abs(F) > 0.01 * S.p.D * S.A0 && Math.abs(l) < 10 ? Math.sign(l) * 10 : l; };
       if (S.show.F) {
-        const FD = S.p.D * (shift() - S.y), FG = S.p.grav ? S.p.m * G0 : 0, FW = -bco() * S.v;
-        const Fref = Math.max(S.p.D * S.A0, FG, 1e-6), kF = 42 / Fref;
-        const lD = clamp(FD * kF, -95, 95), y0D = mY + (lD > 0 ? -bs / 2 : bs / 2);
-        if (arrow(ctx, cx - bs * 0.22, y0D, 0, -lD, C.cF, 3)) sym(ctx, cx - bs * 0.22 - 24, y0D - lD * 0.6, 'F', 'D', C.cF);
-        const lG = clamp(FG * kF, 0, 95);
-        if (FG && arrow(ctx, cx + bs * 0.22, mY + bs / 2, 0, lG, C.ffield, 3)) sym(ctx, cx + bs * 0.22 + 6, mY + bs / 2 + lG * 0.6, 'F', 'G', C.ffield);
-        const lW = clamp(FW * kF, -80, 80);
-        if (S.delta > 0 && arrow(ctx, xr, mY, 0, -lW, C.heat, 3)) sym(ctx, xr + 7, mY - lW * 0.6, 'F', 'W', C.heat);
+        const lD = len(FD), lW = len(FW);
+        if (arrow(ctx, xl, face(lD), 0, -lD, C.cF, 3.5)) flab(xl, face(lD), lD, 'D', C.cF);
+        if (S.delta > 0 && arrow(ctx, xr, face(lW), 0, -lW, C.heat, 3.5)) flab(xr, face(lW), lW, 'W', C.heat);
       }
-      if (S.show.V) { const lv = clamp(S.v / vref * 40, -80, 80); if (arrow(ctx, xr, mY, 0, -lv, C.cv, 3)) sym(ctx, xr + 7, mY - lv * 0.6, 'v', '', C.cv); }
+      if (S.show.R) {
+        const lR = len(FR);
+        if (arrow(ctx, xn, mY, 0, -lR, C.muted, 3.5)) flab(xn, mY, lR, 'res', C.muted);
+      }
+      if (S.show.V) {   // off at the start; beside the mass, from its middle
+        const xv = S.show.R ? xn + 30 : cx + bs / 2 + 12, lv = clamp(S.v / vref * 40, -80, 80);
+        if (arrow(ctx, xv, mY, 0, -lv, C.cv, 3)) sym(ctx, xv + 7, mY - lv * 0.6, 'v', '', C.cv);
+      }
       if (pen) {   // a rigid arm with a pen: the mass writes on the paper
         ctx.strokeStyle = C.mark; ctx.lineWidth = 1.2; ctx.lineCap = 'round';
         ctx.beginPath(); ctx.moveTo(cx + bs / 2, mY); ctx.lineTo(gx0, mY); ctx.stroke();
@@ -1017,7 +1069,7 @@ body.fs-open { overflow: hidden; }
         ctx.font = `12px ${BODY}`;
         const need = items.reduce((s, [l]) => s + ctx.measureText(l).width + 34, 0);
         let lx = aw + 6 + gsel.offsetWidth + 14;
-        if (lx + need < w - 56) {
+        if (lx + need < freeRight(cv, w)) {
           for (const [s, c] of items) {
             ctx.fillStyle = c; ctx.fillRect(lx, 28.5, 14, 3);
             text(ctx, s, lx + 18, 30, C.muted, `12px ${BODY}`, 'left'); lx += ctx.measureText(s).width + 34;
@@ -1053,8 +1105,9 @@ body.fs-open { overflow: hidden; }
         ['<span class="t-cx">Auslenkung</span> <span class="m">x</span>', 'cm', fmt(S.y * 100, 1)],
         ['<span class="t-cv">Geschwindigkeit</span> <span class="m">v</span>', 'm/s', fmt(S.v, 2)],
         ['<span class="t-ca">Beschleunigung</span> <span class="m">a</span>', 'm/s²', fmt(a, 2)],
-        ['<span class="t-cF">Federkraft</span> <span class="m">F<sub>D</sub></span> (+ = nach oben)', 'N', fmt(S.p.D * (shift() - S.y), 2)],
+        ['<span class="t-cF">Rückstellkraft</span> <span class="m">F<sub>D</sub> = −D x</span> (+ = nach oben)', 'N', fmt(-S.p.D * S.y, 2)],
         ['<span class="t-q">Reibungskraft</span> <span class="m">F<sub>W</sub> = −b v</span>', 'N', fmt(-bco() * S.v, 2)],
+        ['Gesamtkraft <span class="m">F<sub>res</sub> = F<sub>D</sub> + F<sub>W</sub> = m a</span>', 'N', fmt(S.p.m * a, 2)],
         ['<span class="t-ek">Kinetische Energie</span>', eU, fmt(e.k * eF, eD)],
         ['<span class="t-ep">Potentielle Energie</span> <span class="m">½ D x²</span>', eU, fmt(e.p * eF, eD)],
         ['Mechanische Energie', eU, fmt((e.k + e.p) * eF, eD)],
@@ -1083,7 +1136,9 @@ body.fs-open { overflow: hidden; }
           '<b>Kriechfall</b> (<span class="m">δ² &gt; ω<sub>0</sub>²</span>, starke Dämpfung): langsame Rückkehr zur Ruhelage, ohne zu schwingen. Je stärker die Dämpfung, desto langsamer.',
         ][k];
         $('#d-cmpLegend').hidden = !S.show.cmp;
-        $('#d-showNote').innerHTML = (S.show.pen ? '<b>Masse schreibt:</b> Ein Stift an der Masse zeichnet die Kurve auf das Papier. Die neueste Stelle ist links beim Stift, das Papier läuft nach rechts weg. ' : '') +
+        const share = k === 1 && S.zeta <= 0.3 ? ` Mit <span class="m">δ</span> = ${fmt(S.zeta, 2)} <span class="m">ω<sub>0</sub></span> ist <span class="m">F<sub>W</sub></span> höchstens etwa ${fmt(2 * S.zeta * 100)} % der grössten Rückstellkraft, darum ist der Pfeil kurz.` : '';
+        $('#d-showNote').innerHTML = (S.show.F ? `<b>Kräfte wie auf der Folie:</b> Die Rückstellkraft <span class="m">F<sub>D</sub> = −D x</span> (orange) zeigt immer zur Ruhelage. Die Reibungskraft <span class="m">F<sub>W</sub> = −b v</span> (pink) zeigt immer gegen die Bewegungsrichtung. Beide Kräfte sind im gleichen Massstab gezeichnet und setzen oben oder unten an der Masse an, auf der Seite, zu der sie ziehen.${share}${S.show.R ? ' Grau: die Gesamtkraft <span class="m">F<sub>res</sub> = F<sub>D</sub> + F<sub>W</sub> = m a</span>. Zeigt sie in Bewegungsrichtung, wird die Masse schneller, zeigt sie dagegen, wird sie langsamer.' : ''}${S.show.V ? ' Der türkise Pfeil ist die Geschwindigkeit <span class="m">v</span>.' : ''}${S.p.grav ? ' Mit Schwerkraft ist <span class="m">F<sub>D</sub></span> die Summe aus Federkraft und Gewichtskraft: Die Gewichtskraft verschiebt nur die Ruhelage (Folie 3).' : ''} ` : '') +
+          (S.show.pen ?'<b>Masse schreibt:</b> Ein Stift an der Masse zeichnet die Kurve auf das Papier. Die neueste Stelle ist links beim Stift, das Papier läuft nach rechts weg. ' : '') +
           'Gestrichelt: die Lösung der Bewegungsgleichung als Formel, sie liegt genau auf der simulierten Kurve. Punktiert: die Einhüllende <span class="m">±A e<sup>−δt</sup></span>, an der die Maxima entlanglaufen (nur im Schwingfall). Mit den Knöpfen x, v, a und E über dem Graphen kannst du mehrere Grössen gleichzeitig einblenden. Bei E siehst du auch, wie viel Energie schon in Wärme umgewandelt ist.';
         writeEq(); writeDgl();
       }
@@ -1106,7 +1161,7 @@ body.fs-open { overflow: hidden; }
           txt = `Hier ist <span class="m">δ = ω<sub>0</sub></span> = ${fmt(w, 2)} 1/s. Die Masse kehrt ohne Überschwingen zur Ruhelage zurück, schneller als bei jeder anderen Dämpfung. So stellt man Stossdämpfer und Messinstrumente ein.`;
         } else {
           title = 'Kriechfall: langsame Rückkehr';
-          txt = `Hier ist <span class="m">δ</span> = ${fmt(S.zeta, 2)} <span class="m">ω<sub>0</sub></span>. Die Reibung ist so stark, dass die Masse nicht mehr schwingt. Sie kriecht zur Ruhelage zurück, umso langsamer, je stärker die Dämpfung ist. Vergleiche mit dem Grenzfall.`;
+          txt = `Hier ist <span class="m">δ</span> = ${fmt(S.zeta, 2)} <span class="m">ω<sub>0</sub></span>. Die Reibung ist so stark, dass die Masse nicht mehr schwingt. Sie kriecht zur Ruhelage zurück, umso langsamer, je stärker die Dämpfung ist. Vergleiche mit dem Grenzfall. Kurz nach dem Start ist die Reibungskraft etwas grösser als die Rückstellkraft: Die Gesamtkraft (grau) zeigt gegen die Bewegung, die Masse wird beim Heranschleichen langsamer.`;
         }
         txt += ' Pausiere, um einen Zeitpunkt genau anzuschauen.';
       } else {
@@ -1115,10 +1170,14 @@ body.fs-open { overflow: hidden; }
         const amp = Math.hypot(S.y, S.v / w), turn = Math.abs(S.v) < 0.1 * amp * w, rest = Math.abs(S.y) < 0.1 * amp;
         const out = S.y * S.v > 0;
         title = amp < 0.003 * S.A0 ? 'Die Bewegung ist abgeklungen' : turn ? `Umkehrpunkt ${S.y > 0 ? 'oben' : 'unten'}` : rest ? 'Durch die Ruhelage' : out ? `Weg von der Ruhelage, nach ${S.y > 0 ? 'oben' : 'unten'}` : 'Zurück zur Ruhelage';
-        const FD = S.p.D * (shift() - S.y), FW = -bco() * S.v;
-        txt = `<span class="m">x</span> = ${fmt(S.y * 100, 1)} cm, <span class="m">v</span> = ${fmt(S.v, 2)} m/s, <span class="m">a</span> = ${fmt(a, 2)} m/s². Federkraft <span class="m">F<sub>D</sub></span> = ${fmt(FD, 2)} N.` +
+        const FD = -S.p.D * S.y, FW = -bco() * S.v, FR = FD + FW, slow = FR * S.v < 0;
+        // speeding up or braking: the resulting force along or against the motion
+        const brake = amp < 0.003 * S.A0 || turn ? '' :
+          ` Gesamtkraft <span class="m">F<sub>res</sub> = m a</span> = ${fmt(FR, 2)} N: Sie zeigt ${slow ? 'gegen die Bewegung, die Masse wird langsamer' : 'in Bewegungsrichtung, die Masse wird schneller'}.` +
+          (slow && FD * S.v > 0 ? ' Das geht nur, weil die Reibungskraft hier grösser ist als die Rückstellkraft.' : '');
+        txt = `<span class="m">x</span> = ${fmt(S.y * 100, 1)} cm, <span class="m">v</span> = ${fmt(S.v, 2)} m/s, <span class="m">a</span> = ${fmt(a, 2)} m/s². Rückstellkraft <span class="m">F<sub>D</sub></span> = ${fmt(FD, 2)} N, sie zeigt immer zur Ruhelage.` +
           (S.delta > 0 ? ` Reibungskraft <span class="m">F<sub>W</sub></span> = ${fmt(FW, 2)} N, sie zeigt immer gegen die Geschwindigkeit.` : '') +
-          (amp < 0.003 * S.A0 ? '' : turn ? ' Am Umkehrpunkt ist die Geschwindigkeit null, also auch die Reibungskraft.' : rest ? ' In der Ruhelage ist die Geschwindigkeit am grössten, also auch die Reibungskraft.' : '') +
+          (amp < 0.003 * S.A0 ? '' : turn ? ' Am Umkehrpunkt ist die Geschwindigkeit null, also auch die Reibungskraft.' : rest ? ' In der Ruhelage ist die Geschwindigkeit am grössten, also auch die Reibungskraft.' : '') + brake +
           ` Energie: ${fmt(ek * 100)} % der mechanischen Energie ist kinetisch, ${fmt((1 - ek) * 100)} % potentiell.` +
           (S.delta > 0 ? ` Von der Startenergie sind schon ${fmt(lost * 100)} % in Wärme umgewandelt.` : '');
       }
@@ -1182,11 +1241,12 @@ body.fs-open { overflow: hidden; }
         ['Wohin geht die Energie?', 'Blende im Graphen E ein. Die mechanische Energie (gestrichelt) nimmt ab, die Wärme (pink) nimmt zu. Die Summe bleibt die Startenergie. Am meisten Energie geht verloren, wenn die Masse schnell ist, also beim Durchgang durch die Ruhelage: <span class="m">dE/dt = −b v²</span>.'],
         ['Wie sollte man einen Stossdämpfer im Auto einstellen?', 'Nahe am Grenzfall. Zu schwach gedämpft schaukelt das Auto nach jeder Bodenwelle nach. Zu stark gedämpft (Kriechfall) federt es langsam aus und ist beim nächsten Schlag noch zusammengedrückt.'],
         ['Mach im Kriechfall die Dämpfung noch stärker. Wird die Rückkehr schneller?', 'Nein, langsamer. Die Flüssigkeit bremst so stark, dass die Feder die Masse kaum noch zurückziehen kann. Mit <span class="m">δ</span> = 2.5 <span class="m">ω<sub>0</sub></span> ist die Masse nach mehreren Perioden noch nicht zurück.'],
+        ['Im Kriechfall ist der Pfeil der Reibungskraft länger als der der Rückstellkraft. Kann das stimmen?', 'Ja. Nach Newton ist <span class="m">F<sub>D</sub> + F<sub>W</sub> = m a</span>. Nur ganz am Anfang wird die Masse schneller, dort ist <span class="m">F<sub>W</sub></span> noch kleiner. Danach wird sie wieder langsamer, weil sie an die Ruhelage heranschleicht. Langsamer werden heisst: Die Gesamtkraft (grau) zeigt gegen die Bewegung, also muss <span class="m">F<sub>W</sub></span> grösser sein als <span class="m">F<sub>D</sub></span>. Genau wenn beide gleich gross sind, ist die Geschwindigkeit am grössten. Im Kriechfall ist der Unterschied klein: Bei <span class="m">δ</span> = 2 <span class="m">ω<sub>0</sub></span> ist <span class="m">F<sub>W</sub></span> etwa 7 % grösser, die Masse ist fast im Gleichgewicht. Im Grenzfall wird <span class="m">F<sub>W</sub></span> bis zu doppelt so gross wie <span class="m">F<sub>D</sub></span>. Pausiere und lies die Kräfte in der Tabelle ab.'],
         ['Starte mit <span class="m">x(0) = 0</span> und <span class="m">v(0)</span> = 1 m/s im Grenzfall. Was passiert?', 'Die Masse schiesst einmal hinaus, kehrt um und kriecht dann ohne Überschwingen zurück. „Kein Überschwingen“ heisst: Sie geht höchstens einmal durch die Ruhelage. Vergleiche mit dem Schwingfall.'],
         ['Schalte die Schwerkraft aus und ein. Ändert sich etwas an der Dämpfung?', 'Nein. Die Schwerkraft verschiebt nur die Ruhelage nach unten. Die Bewegungsgleichung um die neue Ruhelage ist dieselbe, also auch <span class="m">ω<sub>0</sub></span>, <span class="m">δ</span> und der Fall der Dämpfung.'],
       ];
       $('#d-try').innerHTML = detailsList(T);
-      $('#d-foot').innerHTML = 'Die Feder ist masselos, die Masse ein Punkt. <span class="m">x</span> ist von der Ruhelage aus gemessen, nach oben positiv. Die Reibung ist proportional zur Geschwindigkeit, <span class="m">F<sub>W</sub> = −b v</span>. Pfeile: Federkraft (orange), Gewichtskraft (rot), Reibungskraft (pink) und Geschwindigkeit (türkis). Die Animation ist nicht massstäblich: Die Auslenkung ist so vergrössert, dass sie die Höhe des Graphen füllt. Gerechnet wird mit dem Runge-Kutta-Verfahren in Schritten von 0.5 ms.';
+      $('#d-foot').innerHTML = 'Die Feder ist masselos, die Masse ein Punkt. <span class="m">x</span> ist von der Ruhelage aus gemessen, nach oben positiv. Die Reibung ist proportional zur Geschwindigkeit, <span class="m">F<sub>W</sub> = −b v</span>. Pfeile: Rückstellkraft <span class="m">F<sub>D</sub> = −D x</span> (orange) und Reibungskraft (pink), dazu ihre Summe, die Gesamtkraft <span class="m">F<sub>res</sub> = m a</span> (grau), alle im gleichen Massstab. Sehr kleine Kräfte werden mindestens so lang gezeichnet, dass man ihre Richtung sieht. Die Geschwindigkeit (türkis) lässt sich unter „Anzeigen“ dazuschalten. Mit Schwerkraft ist <span class="m">x</span> von der tieferen Ruhelage aus gemessen, und <span class="m">F<sub>D</sub></span> ist Federkraft plus Gewichtskraft. Die Animation ist nicht massstäblich: Die Auslenkung ist so vergrössert, dass sie die Höhe des Graphen füllt. Gerechnet wird mit dem Runge-Kutta-Verfahren in Schritten von 0.5 ms.';
     }
 
     /* ---------- inputs ---------- */
@@ -1196,7 +1256,7 @@ body.fs-open { overflow: hidden; }
     $('#d-z').addEventListener('input', e => { S.zeta = +e.target.value; reset(); });
     $$('[data-dz]').forEach(b => b.addEventListener('click', () => { S.zeta = +b.dataset.dz; $('#d-z').value = S.zeta; reset(); }));
     $$('input[name="d-tempo"]').forEach(r => r.addEventListener('change', () => { S.tempo = +r.value; }));
-    [['d-pen', 'pen'], ['d-sol', 'sol'], ['d-env', 'env'], ['d-cmp', 'cmp'], ['d-F', 'F'], ['d-V', 'V']].forEach(([id, k]) =>
+    [['d-pen', 'pen'], ['d-sol', 'sol'], ['d-env', 'env'], ['d-cmp', 'cmp'], ['d-F', 'F'], ['d-R', 'R'], ['d-V', 'V']].forEach(([id, k]) =>
       $('#' + id).addEventListener('change', e => { S.show[k] = e.target.checked; S.dirty = true; ui(true); }));
     $('#d-defaults').addEventListener('click', () => {
       S.p = { m: DEF.m, D: DEF.D, x0: DEF.x0, v0: DEF.v0, grav: DEF.grav }; S.zeta = DEF.zeta;
@@ -1741,7 +1801,7 @@ body.fs-open { overflow: hidden; }
       const Y = p => yr - p / Aref * hr;
       const st = status();
 
-      text(ctx, `t = ${fmt(t, 2)} s`, w - 60, 28, C.ink, `italic 16px ${MATH}`, 'right');
+      text(ctx, `t = ${fmt(t, 2)} s`, freeRight(cv, w) - 4, 28, C.ink, `italic 16px ${MATH}`, 'right');
 
       /* ---- the rope: a photo at time t ---- */
       ctx.lineWidth = 1; ctx.font = `12px ${BODY}`; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
@@ -2141,12 +2201,81 @@ body.fs-open { overflow: hidden; }
 
   /* ---------- full screen ---------- */
   let fsWrap = null;
+
+  // Two side panels in full screen. They hold the page's own control sections, moved over while full screen lasts
+  // and put back afterwards, so every setting stays in step with the page.
+  const FSP = {
+    d: { show: ['d-h-show'], set: ['d-h-damp', 'd-h-set'] },
+    f: { show: ['f-h-show'], set: ['f-h-drv', 'f-h-damp'] },
+    w: { show: ['w-h-show'], set: ['w-h-pre', 'w-h-time', 'w-h-1', 'w-h-2', 'w-h-rope'] },
+  };
+  const FSP_NAME = { show: 'Anzeige', set: 'Einstellungen' };
+  const FSP_ICON = {
+    show: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+    set: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg>',
+  };
+  const moved = [];   // [section, placeholder]
+  for (const wrap of $$('.stagewrap')) {
+    const vb = wrap.querySelector('.viewbtns'), side = document.createElement('div');
+    side.className = 'fsside'; side.hidden = true;
+    side.setAttribute('role', 'region'); side.setAttribute('aria-label', 'Anzeige und Einstellungen');
+    for (const p of ['show', 'set']) {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'tbtn fspBtn'; b.dataset.fsp = p; b.hidden = true;
+      b.setAttribute('aria-pressed', 'false'); b.title = FSP_NAME[p] + ' ein- oder ausblenden';
+      b.innerHTML = FSP_ICON[p] + `<span class="tl">${FSP_NAME[p]}</span>`;
+      vb.insertBefore(b, vb.querySelector('.fullBtn'));
+      const box = document.createElement('div');
+      box.className = 'fsp'; box.dataset.fsp = p; box.hidden = true;
+      box.innerHTML = `<h2>${FSP_NAME[p]}</h2>`;
+      side.appendChild(box);
+      b.addEventListener('click', () => togglePanel(wrap, p));
+    }
+    wrap.appendChild(side);
+  }
+  function togglePanel(wrap, p) {
+    const k = wrap.closest('[data-pg]').dataset.pg;
+    if (!wrap.dataset.fspIn) {   // first panel opened in this full screen: move the sections over
+      for (const q of ['show', 'set']) {
+        const box = wrap.querySelector(`.fsp[data-fsp="${q}"]`);
+        for (const id of FSP[k][q]) {
+          const sec = $('#' + id).closest('section'), ph = document.createComment('panel');
+          sec.before(ph); box.appendChild(sec); moved.push([sec, ph]);
+        }
+      }
+      wrap.dataset.fspIn = '1';
+    }
+    const b = wrap.querySelector(`.fspBtn[data-fsp="${p}"]`), on = b.getAttribute('aria-pressed') !== 'true';
+    b.setAttribute('aria-pressed', String(on));
+    wrap.querySelector(`.fsp[data-fsp="${p}"]`).hidden = !on;
+    const any = wrap.querySelectorAll('.fspBtn[aria-pressed="true"]').length > 0;
+    wrap.querySelector('.fsside').hidden = !any;
+    wrap.classList.toggle('side', any);
+    PG[k].S.dirty = true;
+  }
+  function restorePanels() {
+    for (const [sec, ph] of moved) ph.replaceWith(sec);
+    moved.length = 0;
+    for (const wrap of $$('.stagewrap')) {
+      delete wrap.dataset.fspIn; wrap.classList.remove('side');
+      wrap.querySelector('.fsside').hidden = true;
+      wrap.querySelectorAll('.fsp').forEach(x => { x.hidden = true; });
+      wrap.querySelectorAll('.fspBtn').forEach(x => x.setAttribute('aria-pressed', 'false'));
+    }
+  }
+
   function setFsIcons() {
     $$('.fullBtn').forEach(b => {
       const on = !!fsWrap && b.closest('.stagewrap') === fsWrap;
       b.querySelector('.i-full').toggleAttribute('hidden', on); b.querySelector('.i-exit').toggleAttribute('hidden', !on);
       b.title = on ? 'Vollbild beenden' : 'Vollbild'; b.setAttribute('aria-label', b.title);
     });
+    // the panel buttons only once full screen is really on (the request may still be pending, or refused)
+    const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+    const active = !!fsWrap && (fsEl === fsWrap || fsWrap.classList.contains('fs'));
+    $$('.stagewrap').forEach(wr => wr.classList.toggle('fsOn', active && wr === fsWrap));
+    $$('.fspBtn').forEach(b => { b.hidden = !active || b.closest('.stagewrap') !== fsWrap; });
+    if (!fsWrap) restorePanels();
     document.body.classList.toggle('fs-open', !!fsWrap && fsWrap.classList.contains('fs'));
     if (PG[cur]) PG[cur].S.dirty = true;
   }
